@@ -10,6 +10,8 @@ import {dtoToRecipe, recipeToDtoPayload, recipeToDtoPayloadPartial} from "../rec
 export interface RecipeStore {
     recipes: Recipe[]
     setRecipes: (recipes: Recipe[]) => void
+    initialized: boolean
+    setInitialized: (v: boolean) => void
     loadRecipes: () => Promise<void>
     getRecipeBySlug: (slug: string) => Promise<Recipe | undefined>
     addRecipe: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">) => Promise<void>
@@ -19,7 +21,9 @@ export interface RecipeStore {
 
 export const useRecipeStore = create<RecipeStore>((set, get) => ({
     recipes: [],
-    setRecipes: (recipes: Recipe[]) => set({recipes}),
+    initialized: false,
+    setRecipes: (recipes) => set({recipes}),
+    setInitialized: (v) => set({initialized: v}),
     loadRecipes: async () => {
         const supabase = supabaseBrowser()
         const {data, error} = await supabase
@@ -32,7 +36,7 @@ export const useRecipeStore = create<RecipeStore>((set, get) => ({
 
         const authorName = "Holy Seitan"
         const mapped = (data ?? []).map((d) => dtoToRecipe(d, authorName))
-        set({recipes: mapped})
+        set({recipes: mapped, initialized: true})
     },
     getRecipeBySlug: async (slug) => {
         const cache = get().recipes.find((r) => r.slug === slug)
