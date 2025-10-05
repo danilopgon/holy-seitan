@@ -1,24 +1,19 @@
 "use client"
 
+import {X} from "lucide-react"
 import type React from "react"
+import {useState} from "react"
+import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select"
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
+import {Textarea} from "@/components/ui/textarea"
+import type {Recipe} from "@/core/models/recipe";
+import type {RecipeFormProps} from "@/core/models/recipe-page-props";
+import {MarkdownRenderer} from "./markdown-renderer"
 
-import { useState } from "react"
-import type { Recipe } from "@/lib/types"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { MarkdownRenderer } from "./markdown-renderer"
-import { X } from "lucide-react"
-
-interface RecipeFormProps {
-  recipe?: Recipe
-  onSubmit: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt">) => void
-  onCancel: () => void
-}
 
 export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
   const [formData, setFormData] = useState({

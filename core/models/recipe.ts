@@ -13,4 +13,5 @@ export interface Recipe {
     author: string
     createdAt: string
     updatedAt: string
+    isPublished: boolean
 }

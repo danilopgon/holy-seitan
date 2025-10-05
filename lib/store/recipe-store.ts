@@ -5,10 +5,11 @@ import type {Recipe} from "@/core/models/recipe"
 import type {RecipeDTO} from "@/core/models/recipe-dto"
 import {supabaseBrowser} from "@/core/supabase-browser"
 import {useAuthStore} from "@/lib/store/auth-store"
-import {dtoToRecipe, recipeToDtoPayload} from "../recipe-adapter"
+import {dtoToRecipe, recipeToDtoPayload, recipeToDtoPayloadPartial} from "../recipe-adapter"
 
 export interface RecipeStore {
     recipes: Recipe[]
+    setRecipes: (recipes: Recipe[]) => void
     loadRecipes: () => Promise<void>
     getRecipeBySlug: (slug: string) => Promise<Recipe | undefined>
     addRecipe: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">) => Promise<void>
@@ -73,27 +74,42 @@ export const useRecipeStore = create<RecipeStore>((set, get) => ({
     },
     updateRecipe: async (id, updates) => {
         const supabase = supabaseBrowser()
-        const payload = updates ? recipeToDtoPayload(updates as Required<typeof updates>) : {}
+
+        const payload = recipeToDtoPayloadPartial(updates)
+
         const {data, error} = await supabase
             .from("recipes")
             .update(payload)
             .eq("id", id)
             .select("*")
-            .single<RecipeDTO>()
+            .maybeSingle<RecipeDTO>()
 
         if (error) throw error
+        if (!data) {
+            throw new Error("No se encontró la receta o no tienes permisos (RLS).")
+        }
+
         const me = useAuthStore.getState().user
         const author = me?.displayName || me?.email || "Autor"
         const mapped = dtoToRecipe(data, author)
 
-        set({
-            recipes: get().recipes.map((r) => (r.id === id ? mapped : r)),
-        })
+        set({recipes: get().recipes.map((r) => (r.id === id ? mapped : r))})
     },
     deleteRecipe: async (id) => {
         const supabase = supabaseBrowser()
-        const {error} = await supabase.from("recipes").delete().eq("id", id)
+
+        const {data, error} = await supabase
+            .from("recipes")
+            .delete()
+            .eq("id", id)
+            .select("*")
+            .maybeSingle<RecipeDTO>()
+
         if (error) throw error
+        if (!data) {
+            throw new Error("No se pudo borrar: no existe o RLS lo impide.")
+        }
+
         set({recipes: get().recipes.filter((r) => r.id !== id)})
     },
 }))

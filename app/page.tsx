@@ -43,12 +43,11 @@ export default function HomePage() {
             {/* Hero Section */}
             <div className="mb-12 text-center">
                 <h1 className="text-4xl md:text-5xl font-mono font-bold text-foreground mb-4">
-                    Recetas Veganas Colaborativas
+                    Holy Seitan!
                 </h1>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Una colección de deliciosas recetas a base de plantas impulsada por la comunidad. Descubre,
-                    comparte y
-                    disfruta la cocina vegana.
+                    Holy Seitan es el recetario vegano en markdown de María (@mloherr) y Dani (@danilopgon), construido
+                    con Next.js 15, Supabase y Drizzle ORM.
                 </p>
             </div>
 

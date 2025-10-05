@@ -10,7 +10,7 @@ export type RecipeDTO = {
     servings: number;
     difficulty: "easy" | "medium" | "hard";
     tags?: string[];
-    is_published?: boolean;
+    is_published: boolean;
     created_by: string;
     created_at: Date;
     updated_at: Date;

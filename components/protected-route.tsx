@@ -1,27 +1,24 @@
 "use client"
 
-import type React from "react"
-import {useEffect} from "react"
 import {useRouter} from "next/navigation"
-import {useAuthStore} from "@/lib/store/auth-store"
+import {useEffect, useState} from "react"
+import {supabaseBrowser} from "@/core/supabase-browser";
 
-interface ProtectedRouteProps {
-  children: React.ReactNode
-}
+export function ProtectedRoute({children}: { children: React.ReactNode }) {
+    const router = useRouter()
+    const [ok, setOk] = useState(false)
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const router = useRouter()
-  const user = useAuthStore((state) => state.user)
+    useEffect(() => {
+        const supabase = supabaseBrowser()
+        supabase.auth.getSession().then(({data}) => {
+            if (!data.session) {
+                router.replace("/login")
+            } else {
+                setOk(true)
+            }
+        })
+    }, [router])
 
-  useEffect(() => {
-    if (!user?.isAdmin) {
-      router.push("/login")
-    }
-  }, [user, router])
-
-  if (!user?.isAdmin) {
-    return null
-  }
-
-  return <>{children}</>
+    if (!ok) return null
+    return <>{children}</>
 }

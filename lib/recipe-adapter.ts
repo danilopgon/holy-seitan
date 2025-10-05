@@ -29,6 +29,7 @@ export function dtoToRecipe(dto: RecipeDTO, author: string): Recipe {
         author,
         createdAt: new Date(dto.created_at).toISOString(),
         updatedAt: new Date(dto.updated_at).toISOString(),
+        isPublished: dto.is_published
     }
 }
 
@@ -48,4 +49,31 @@ export function recipeToDtoPayload(
         tags: r.tags ?? [],
         is_published: true,
     }
+}
+
+type PartialRecipe = Partial<Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">>
+
+export function recipeToDtoPayloadPartial(input: PartialRecipe) {
+    const out: Partial<RecipeDTO> = {}
+
+    if (input.title !== undefined) out.title = input.title
+    if (input.slug !== undefined) out.slug = input.slug
+    if (input.description !== undefined) out.description = input.description
+    if (input.content !== undefined) out.content_md = input.content
+    if (input.emoji !== undefined) out.emoji = input.emoji
+    if (input.prepTime !== undefined) out.prep_time = input.prepTime
+    if (input.cookTime !== undefined) out.cook_time = input.cookTime
+    if (input.servings !== undefined) out.servings = input.servings
+    if (input.difficulty !== undefined) {
+        const map: Record<string, RecipeDTO["difficulty"]> = {
+            "Facil": "easy",
+            "Media": "medium",
+            "Dificil": "hard",
+        }
+        out.difficulty = map[input.difficulty] ?? "easy"
+    }
+    if (input.tags !== undefined) out.tags = input.tags
+    if (input.isPublished !== undefined) out.is_published = input.isPublished
+
+    return out
 }
