@@ -10,6 +10,7 @@ export default function HomePage() {
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedTags, setSelectedTags] = useState<string[]>([])
 
+
     const allTags = useMemo(() => {
         const tags = new Set<string>()
         recipes.forEach((recipe) => {

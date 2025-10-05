@@ -90,12 +90,6 @@ export default function LoginPage() {
                             {isLoading ? "Iniciando sesión..." : "Iniciar Sesión"}
                         </Button>
                     </form>
-
-                    <div className="mt-6 p-4 bg-muted rounded-lg">
-                        <p className="text-sm font-mono text-muted-foreground mb-2">Credenciales de Demostración:</p>
-                        <p className="text-xs font-mono">Correo: admin@holyseitan.com</p>
-                        <p className="text-xs font-mono">Contraseña: admin123</p>
-                    </div>
                 </CardContent>
             </Card>
         </main>

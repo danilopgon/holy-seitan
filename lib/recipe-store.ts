@@ -1,35 +1,102 @@
 "use client"
 
 import {create} from "zustand"
-import {mockRecipes} from "./mock-data"
-import type {RecipeStore} from "@/models/recipeStore";
-import type {Recipe} from "@/models/recipe";
+import {useAuthStore} from "@/lib/auth-store"
+import {supabaseBrowser} from "@/lib/supabase-browser"
+import type {Recipe} from "./models/recipe"
+import type {RecipeDTO} from "./models/recipe-dto"
+import {dtoToRecipe, recipeToDtoPayload} from "./recipe-adapter"
 
+export interface RecipeStore {
+    recipes: Recipe[]
+    loadRecipes: () => Promise<void>
+    getRecipeBySlug: (slug: string) => Promise<Recipe | undefined>
+    addRecipe: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">) => Promise<void>
+    updateRecipe: (id: string, recipe: Partial<Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">>) => Promise<void>
+    deleteRecipe: (id: string) => Promise<void>
+}
 
 export const useRecipeStore = create<RecipeStore>((set, get) => ({
-    recipes: mockRecipes,
-    addRecipe: (recipe) => {
-        const newRecipe: Recipe = {
-            ...recipe,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        }
-        set((state) => ({recipes: [...state.recipes, newRecipe]}))
+    recipes: [],
+    loadRecipes: async () => {
+        const supabase = supabaseBrowser()
+        const {data, error} = await supabase
+            .from("recipes")
+            .select("*")
+            .order("created_at", {ascending: false})
+            .returns<RecipeDTO[]>()
+
+        if (error) throw error
+
+        const authorName = "Holy Seitan"
+        const mapped = (data ?? []).map((d) => dtoToRecipe(d, authorName))
+        set({recipes: mapped})
     },
-    updateRecipe: (id, updates) => {
-        set((state) => ({
-            recipes: state.recipes.map((recipe) =>
-                recipe.id === id ? {...recipe, ...updates, updatedAt: new Date().toISOString()} : recipe,
-            ),
-        }))
+
+    getRecipeBySlug: async (slug) => {
+        const cache = get().recipes.find((r) => r.slug === slug)
+        if (cache) return cache
+        const supabase = supabaseBrowser()
+        const {data, error} = await supabase
+            .from("recipes")
+            .select("*")
+            .eq("slug", slug)
+            .maybeSingle()
+
+        if (error || !data) return undefined
+
+        const me = useAuthStore.getState().user
+        const author = me?.displayName || me?.email || "Autor"
+        const mapped = dtoToRecipe(data as RecipeDTO, author)
+        set({recipes: [...get().recipes.filter((r) => r.slug !== slug), mapped]})
+        return mapped
     },
-    deleteRecipe: (id) => {
-        set((state) => ({
-            recipes: state.recipes.filter((recipe) => recipe.id !== id),
-        }))
+
+    addRecipe: async (recipe) => {
+        const supabase = supabaseBrowser()
+        const me = useAuthStore.getState().user
+        if (!me) throw new Error("No auth")
+
+        const payload = recipeToDtoPayload(recipe)
+        const {data, error} = await supabase
+            .from("recipes")
+            .insert({
+                ...payload,
+                created_by: me.id,
+            })
+            .select("*")
+            .single<RecipeDTO>()
+
+        if (error) throw error
+        const author = me.displayName || me.email
+        const mapped = dtoToRecipe(data, author)
+        set({recipes: [mapped, ...get().recipes]})
     },
-    getRecipeBySlug: (slug) => {
-        return get().recipes.find((recipe) => recipe.slug === slug)
+
+    updateRecipe: async (id, updates) => {
+        const supabase = supabaseBrowser()
+        const payload = updates ? recipeToDtoPayload(updates as Required<typeof updates>) : {}
+        const {data, error} = await supabase
+            .from("recipes")
+            .update(payload)
+            .eq("id", id)
+            .select("*")
+            .single<RecipeDTO>()
+
+        if (error) throw error
+        const me = useAuthStore.getState().user
+        const author = me?.displayName || me?.email || "Autor"
+        const mapped = dtoToRecipe(data, author)
+
+        set({
+            recipes: get().recipes.map((r) => (r.id === id ? mapped : r)),
+        })
+    },
+
+    deleteRecipe: async (id) => {
+        const supabase = supabaseBrowser()
+        const {error} = await supabase.from("recipes").delete().eq("id", id)
+        if (error) throw error
+        set({recipes: get().recipes.filter((r) => r.id !== id)})
     },
 }))

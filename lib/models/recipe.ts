@@ -8,7 +8,7 @@ export interface Recipe {
     prepTime: number
     cookTime: number
     servings: number
-    difficulty: "Fácil" | "Media" | "Difícil"
+    difficulty: "Facil" | "Media" | "Dificil"
     tags: string[]
     author: string
     createdAt: string
