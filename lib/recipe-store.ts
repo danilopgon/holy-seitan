@@ -1,8 +1,8 @@
 "use client"
 
-import { create } from "zustand"
-import type { Recipe } from "./types"
-import { mockRecipes } from "./mock-data"
+import {create} from "zustand"
+import {mockRecipes} from "./mock-data"
+import type {Recipe} from "./types"
 
 interface RecipeStore {
   recipes: Recipe[]

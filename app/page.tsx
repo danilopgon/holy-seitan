@@ -10,7 +10,6 @@ export default function HomePage() {
     const [searchQuery, setSearchQuery] = useState("")
     const [selectedTags, setSelectedTags] = useState<string[]>([])
 
-    // Get all unique tags
     const allTags = useMemo(() => {
         const tags = new Set<string>()
         recipes.forEach((recipe) => {
@@ -21,16 +20,13 @@ export default function HomePage() {
         return Array.from(tags).sort()
     }, [recipes])
 
-    // Filter recipes
     const filteredRecipes = useMemo(() => {
         return recipes.filter((recipe) => {
-            // Search filter
             const matchesSearch =
                 searchQuery === "" ||
                 recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
 
-            // Tag filter
             const matchesTags = selectedTags.length === 0 || selectedTags.every((tag) => recipe.tags.includes(tag))
 
             return matchesSearch && matchesTags
