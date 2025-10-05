@@ -1,14 +1,8 @@
 "use client"
 
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
-
-interface AuthStore {
-  user: { email: string; isAdmin: boolean } | null
-  login: (email: string, password: string) => Promise<boolean>
-  logout: () => void
-  isAuthenticated: () => boolean
-}
+import {create} from "zustand"
+import {persist} from "zustand/middleware"
+import type {AuthStore} from "@/models/authStore";
 
 export const useAuthStore = create<AuthStore>()(
   persist(

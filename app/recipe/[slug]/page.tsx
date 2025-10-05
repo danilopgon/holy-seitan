@@ -1,16 +1,13 @@
 "use client"
 
-import {useRecipeStore} from "@/lib/recipe-store"
-import {MarkdownRenderer} from "@/components/markdown-renderer"
-import {Badge} from "@/components/ui/badge"
-import {Button} from "@/components/ui/button"
 import {ArrowLeft, ChefHat, Clock, Users} from "lucide-react"
 import Link from "next/link"
 import {notFound} from "next/navigation"
-
-interface RecipePageProps {
-    params: { slug: string }
-}
+import {MarkdownRenderer} from "@/components/markdown-renderer"
+import {Badge} from "@/components/ui/badge"
+import {Button} from "@/components/ui/button"
+import {useRecipeStore} from "@/lib/recipe-store"
+import type {RecipePageProps} from "@/models/recipePageProps";
 
 export default function RecipePage({params}: RecipePageProps) {
     const {slug} = params
