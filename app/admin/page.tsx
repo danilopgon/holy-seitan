@@ -102,7 +102,7 @@ export default function AdminPage() {
                     </div>
 
                     {viewMode === "list" && (
-                        <div className="flex w-full gap-2 md:w-auto">
+                        <div className="flex w-full gap-2 md:w-auto flex-col md:flex-row">
                             {/* Search input */}
                             <div className="relative flex-1 md:w-80">
                                 <Search
@@ -131,7 +131,7 @@ export default function AdminPage() {
                             {skeletonKeys.map((k) => (
                                 <Card key={k}>
                                     <CardContent className="p-6">
-                                        <div className="flex gap-6">
+                                        <div className="flex gap-6 flex-col md:flex-row">
                                             <div className="h-32 w-32 rounded-lg bg-muted animate-pulse"/>
                                             <div className="flex-1 space-y-3">
                                                 <div className="h-6 w-1/2 bg-muted rounded animate-pulse"/>
@@ -144,66 +144,65 @@ export default function AdminPage() {
                             ))}
                         </div>
                     ) : (
-                        <>
-                            {filtered.length === 0 ? (
-                                <div className="text-center py-16 border border-dashed rounded-lg">
-                                    <p className="text-muted-foreground font-mono">
-                                        No hay recetas que coincidan con “{searchQuery}”.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="grid grid-cols-1 gap-4">
-                                    {filtered.map((recipe) => (
-                                        <Card key={recipe.id}>
-                                            <CardContent className="p-6">
-                                                <div className="flex gap-6">
+                        filtered.length === 0 ? (
+                            <div className="text-center py-16 border border-dashed rounded-lg">
+                                <p className="text-muted-foreground font-mono">
+                                    No hay recetas que coincidan con “{searchQuery}”.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-4">
+                                {filtered.map((recipe) => (
+                                    <Card key={recipe.id}>
+                                        <CardContent className="p-6">
+                                            <div
+                                                className="flex gap-6 flex-col md:flex-row">
+                                                <div
+                                                    className="h-32 w-32 flex-shrink-0 rounded-lg bg-muted flex items-center justify-center text-7xl">
+                                                    {recipe.emoji}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <CardTitle
+                                                        className="font-mono text-xl mb-2">{recipe.title}</CardTitle>
+                                                    <CardDescription
+                                                        className="mb-4">{recipe.description}</CardDescription>
                                                     <div
-                                                        className="h-32 w-32 flex-shrink-0 rounded-lg bg-muted flex items-center justify-center text-7xl">
-                                                        {recipe.emoji}
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <CardTitle
-                                                            className="font-mono text-xl mb-2">{recipe.title}</CardTitle>
-                                                        <CardDescription
-                                                            className="mb-4">{recipe.description}</CardDescription>
-                                                        <div
-                                                            className="flex gap-2 text-sm text-muted-foreground font-mono">
-                                                            <span>{recipe.prepTime + recipe.cookTime}m</span>
-                                                            <span>•</span>
-                                                            <span>{recipe.servings} porciones</span>
-                                                            <span>•</span>
-                                                            <span>{recipe.difficulty}</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex flex-col gap-2">
-                                                        <Button
-                                                            variant="outline"
-                                                            size="sm"
-                                                            onClick={() => handleEdit(recipe)}
-                                                            className="font-mono"
-                                                            disabled={busy}
-                                                        >
-                                                            <Pencil className="h-4 w-4 mr-2"/>
-                                                            Editar
-                                                        </Button>
-                                                        <Button
-                                                            variant="destructive"
-                                                            size="sm"
-                                                            onClick={() => handleDelete(recipe)}
-                                                            className="font-mono"
-                                                            disabled={busy}
-                                                        >
-                                                            <Trash2 className="h-4 w-4 mr-2"/>
-                                                            Eliminar
-                                                        </Button>
+                                                        className="flex gap-2 text-sm text-muted-foreground font-mono">
+                                                        <span>{recipe.prepTime + recipe.cookTime}m</span>
+                                                        <span>•</span>
+                                                        <span>{recipe.servings} porciones</span>
+                                                        <span>•</span>
+                                                        <span>{recipe.difficulty}</span>
                                                     </div>
                                                 </div>
-                                            </CardContent>
-                                        </Card>
-                                    ))}
-                                </div>
-                            )}
-                        </>
+                                                <div className="flex flex-col gap-2">
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        onClick={() => handleEdit(recipe)}
+                                                        className="font-mono"
+                                                        disabled={busy}
+                                                    >
+                                                        <Pencil className="h-4 w-4 mr-2"/>
+                                                        Editar
+                                                    </Button>
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        onClick={() => handleDelete(recipe)}
+                                                        className="font-mono"
+                                                        disabled={busy}
+                                                    >
+                                                        <Trash2 className="h-4 w-4 mr-2"/>
+                                                        Eliminar
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        )
                     )
                 )}
 
