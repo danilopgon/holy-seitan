@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import {useAuthStore} from "@/lib/auth-store"
+import {useAuthStore} from "@/lib/store/auth-store"
 import {Button} from "@/components/ui/button"
 import {LogOut} from "lucide-react"
 

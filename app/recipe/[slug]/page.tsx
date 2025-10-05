@@ -6,8 +6,8 @@ import {notFound} from "next/navigation"
 import {MarkdownRenderer} from "@/components/markdown-renderer"
 import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
-import {useRecipeStore} from "@/lib/recipe-store"
-import type {RecipePageProps} from "@/lib/models/recipe-page-props";
+import {useRecipeStore} from "@/lib/store/recipe-store"
+import type {RecipePageProps} from "@/core/models/recipe-page-props";
 
 export default function RecipePage({params}: RecipePageProps) {
     const {slug} = params

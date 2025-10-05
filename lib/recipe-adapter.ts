@@ -1,5 +1,5 @@
-import type {Recipe} from "@/lib/models/recipe";
-import type {RecipeDTO} from "@/lib/models/recipe-dto";
+import type {Recipe} from "@/core/models/recipe";
+import type {RecipeDTO} from "@/core/models/recipe-dto";
 
 const diffToUi: Record<RecipeDTO["difficulty"], Recipe["difficulty"]> = {
     easy: "Facil",

@@ -7,6 +7,7 @@ import {Suspense} from "react"
 import "./globals.css"
 import {Footer} from "@/components/footer";
 import {Header} from "@/components/header";
+import {RecipesProvider} from "@/lib/providers/recipes-provider";
 
 export const metadata: Metadata = {
     title: "Holy Seitan — Recetario Vegano de María y Dani",
@@ -26,7 +27,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
             <div className="min-h-screen bg-background">
                 <Header/>
-                {children}
+                <RecipesProvider>{children}</RecipesProvider>
                 <Footer/>
             </div>
         </Suspense>

@@ -1,7 +1,7 @@
 "use client"
 
 import {useState} from "react"
-import {useRecipeStore} from "@/lib/recipe-store"
+import {useRecipeStore} from "@/lib/store/recipe-store"
 import type {Recipe} from "@/lib/types"
 import {ProtectedRoute} from "@/components/protected-route"
 import {RecipeForm} from "@/components/recipe-form"

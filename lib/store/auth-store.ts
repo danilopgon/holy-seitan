@@ -1,7 +1,7 @@
 "use client"
 import {create} from "zustand"
 import {persist} from "zustand/middleware"
-import {supabaseBrowser} from "@/lib/supabase-browser"
+import {supabaseBrowser} from "@/core/supabase-browser"
 
 export type AuthUser = {
     id: string

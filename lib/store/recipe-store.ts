@@ -1,11 +1,11 @@
 "use client"
 
 import {create} from "zustand"
-import {useAuthStore} from "@/lib/auth-store"
-import {supabaseBrowser} from "@/lib/supabase-browser"
-import type {Recipe} from "./models/recipe"
-import type {RecipeDTO} from "./models/recipe-dto"
-import {dtoToRecipe, recipeToDtoPayload} from "./recipe-adapter"
+import type {Recipe} from "@/core/models/recipe"
+import type {RecipeDTO} from "@/core/models/recipe-dto"
+import {supabaseBrowser} from "@/core/supabase-browser"
+import {useAuthStore} from "@/lib/store/auth-store"
+import {dtoToRecipe, recipeToDtoPayload} from "../recipe-adapter"
 
 export interface RecipeStore {
     recipes: Recipe[]
@@ -18,6 +18,7 @@ export interface RecipeStore {
 
 export const useRecipeStore = create<RecipeStore>((set, get) => ({
     recipes: [],
+    setRecipes: (recipes: Recipe[]) => set({recipes}),
     loadRecipes: async () => {
         const supabase = supabaseBrowser()
         const {data, error} = await supabase
@@ -32,7 +33,6 @@ export const useRecipeStore = create<RecipeStore>((set, get) => ({
         const mapped = (data ?? []).map((d) => dtoToRecipe(d, authorName))
         set({recipes: mapped})
     },
-
     getRecipeBySlug: async (slug) => {
         const cache = get().recipes.find((r) => r.slug === slug)
         if (cache) return cache
@@ -51,7 +51,6 @@ export const useRecipeStore = create<RecipeStore>((set, get) => ({
         set({recipes: [...get().recipes.filter((r) => r.slug !== slug), mapped]})
         return mapped
     },
-
     addRecipe: async (recipe) => {
         const supabase = supabaseBrowser()
         const me = useAuthStore.getState().user
@@ -72,7 +71,6 @@ export const useRecipeStore = create<RecipeStore>((set, get) => ({
         const mapped = dtoToRecipe(data, author)
         set({recipes: [mapped, ...get().recipes]})
     },
-
     updateRecipe: async (id, updates) => {
         const supabase = supabaseBrowser()
         const payload = updates ? recipeToDtoPayload(updates as Required<typeof updates>) : {}
@@ -92,7 +90,6 @@ export const useRecipeStore = create<RecipeStore>((set, get) => ({
             recipes: get().recipes.map((r) => (r.id === id ? mapped : r)),
         })
     },
-
     deleteRecipe: async (id) => {
         const supabase = supabaseBrowser()
         const {error} = await supabase.from("recipes").delete().eq("id", id)

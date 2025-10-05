@@ -1,7 +1,7 @@
 "use client"
 
 import {useMemo, useState} from "react"
-import {useRecipeStore} from "@/lib/recipe-store"
+import {useRecipeStore} from "@/lib/store/recipe-store"
 import {RecipeCard} from "@/components/recipe-card"
 import {RecipeFilters} from "@/components/recipe-filters"
 
