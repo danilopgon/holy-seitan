@@ -3,9 +3,10 @@ import {getRecipeBySlugServerAction} from "@/lib/actions/get-recibe-by-slug";
 import {dtoToRecipe} from "@/lib/recipe-adapter"
 import {RecipeView} from "./recipe-view"
 
-type Props = { params: { slug: string } }
+type Props = { params: Promise<{ slug: string }> }
 
-export default async function RecipePage({params: {slug}}: Props) {
+export default async function RecipePage({ params }: Props) {
+    const { slug } = await params
     const dto = await getRecipeBySlugServerAction(slug)
     if (!dto) notFound()
 
