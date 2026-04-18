@@ -3,10 +3,16 @@
 
 export default function Error({error, reset}: { error: Error; reset: () => void }) {
     return (
-        <main className="p-6">
-            <h1 className="text-xl font-semibold">No se pudo cargar la receta</h1>
-            <p className="mt-2 opacity-80">{error.message}</p>
-            <button className="mt-4 underline" type="button" onClick={() => reset()}>Reintentar</button>
+        <main className="container mx-auto px-4 py-16 text-center">
+            <h1 className="text-2xl font-mono font-semibold tracking-tight text-foreground mb-3">No se pudo cargar la receta</h1>
+            <p className="text-sm text-muted-foreground mb-8">{error.message}</p>
+            <button
+                className="font-mono text-sm text-primary underline hover:text-primary/80 transition-colors"
+                type="button"
+                onClick={() => reset()}
+            >
+                Reintentar
+            </button>
         </main>
     );
 }

@@ -92,7 +92,7 @@ export default function AdminPage() {
             <main className="container mx-auto px-4 py-8">
                 <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 className="text-3xl font-mono font-bold text-foreground mb-2">Panel de Administración</h1>
+                        <h1 className="text-3xl font-mono font-bold tracking-tight leading-tight text-foreground mb-2">Panel de Administración</h1>
                         <p className="text-muted-foreground">
                             Gestiona tu colección de recetas
                             {viewMode === "list" && (
@@ -163,7 +163,7 @@ export default function AdminPage() {
                                                 </div>
                                                 <div className="flex-1">
                                                     <CardTitle
-                                                        className="font-mono text-xl mb-2">{recipe.title}</CardTitle>
+                                                        className="font-mono text-xl font-semibold tracking-tight mb-2">{recipe.title}</CardTitle>
                                                     <CardDescription
                                                         className="mb-4">{recipe.description}</CardDescription>
                                                     <div
@@ -208,14 +208,14 @@ export default function AdminPage() {
 
                 {viewMode === "create" && (
                     <div>
-                        <h2 className="text-2xl font-mono font-bold text-foreground mb-6">Crear Nueva Receta</h2>
+                        <h2 className="text-2xl font-mono font-semibold tracking-tight text-foreground mb-6">Crear Nueva Receta</h2>
                         <RecipeForm onSubmit={handleCreate} onCancel={() => setViewMode("list")} submitting={busy}/>
                     </div>
                 )}
 
                 {viewMode === "edit" && selectedRecipe && (
                     <div>
-                        <h2 className="text-2xl font-mono font-bold text-foreground mb-6">Editar Receta</h2>
+                        <h2 className="text-2xl font-mono font-semibold tracking-tight text-foreground mb-6">Editar Receta</h2>
                         <RecipeForm
                             recipe={selectedRecipe}
                             onSubmit={handleUpdate}
