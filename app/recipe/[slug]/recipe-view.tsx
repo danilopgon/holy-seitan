@@ -20,10 +20,10 @@ export function RecipeView({recipe}: { recipe: Recipe }) {
             </Link>
 
             <div className="mb-8">
-                <h1 className="text-4xl font-mono font-bold text-foreground mb-4">{recipe.title}</h1>
+                <h1 className="text-4xl font-mono font-bold tracking-tight leading-tight text-foreground mb-4">{recipe.title}</h1>
                 <p className="text-lg text-muted-foreground mb-6">{recipe.description}</p>
 
-                <div className="flex flex-wrap items-center gap-6 mb-6">
+                <div className="flex flex-wrap items-center gap-6 mb-6 tabular-nums">
                     <div className="flex items-center gap-2 text-foreground">
                         <Clock className="h-5 w-5 text-primary"/>
                         <div>
@@ -55,11 +55,10 @@ export function RecipeView({recipe}: { recipe: Recipe }) {
                     ))}
                 </div>
 
-                <div
-                    className="relative h-96 w-full rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-          <span className="text-[12rem]" role="img" aria-label={recipe.title}>
-            {recipe.emoji}
-          </span>
+                <div className="relative h-60 w-full rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                    <span className="text-[8rem] animate-in zoom-in-95 fade-in-0 duration-300 ease-out" role="img" aria-label={recipe.title}>
+                        {recipe.emoji}
+                    </span>
                 </div>
             </div>
 

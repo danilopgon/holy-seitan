@@ -8,7 +8,7 @@ import {useRecipeStore} from "@/lib/store/recipe-store"
 function RecipeCardSkeleton() {
     return (
         <div className="rounded-lg border p-6">
-            <div className="h-40 w-full rounded bg-muted animate-pulse mb-4"/>
+            <div className="h-36 w-full rounded bg-muted animate-pulse mb-4"/>
             <div className="h-6 w-2/3 bg-muted rounded animate-pulse mb-2"/>
             <div className="h-4 w-1/2 bg-muted rounded animate-pulse"/>
         </div>
@@ -51,10 +51,10 @@ export default function HomePage() {
     const isLoading = !initialized
 
     return (
-        <main className="container mx-auto px-4 py-8">
+        <main className="container mx-auto px-4 py-12">
             {/* Hero */}
-            <div className="mb-12 text-center">
-                <h1 className="text-4xl md:text-5xl font-mono font-bold text-foreground mb-4">Holy Seitan!</h1>
+            <div className="mb-16 text-center">
+                <h1 className="text-4xl md:text-5xl font-mono font-bold tracking-tight leading-tight text-foreground mb-4">Holy Seitan!</h1>
                 <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                     Holy Seitan es el recetario vegano en markdown de María (@mloherr) y Dani (@danilopgon), construido
                     con Next.js 15, Supabase y Drizzle ORM.
@@ -62,7 +62,7 @@ export default function HomePage() {
             </div>
 
             {/* Filters */}
-            <div className="mb-8 max-w-3xl mx-auto">
+            <div className="mb-10 max-w-3xl mx-auto">
                 <RecipeFilters
                     onSearchChange={setSearchQuery}
                     onTagClick={handleTagClick}
@@ -72,7 +72,7 @@ export default function HomePage() {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in-0 duration-500">
                 {isLoading
                     ? skeletonKeys.map((key) => <RecipeCardSkeleton key={key}/>)
                     : filteredRecipes.map((recipe) => <RecipeCard key={recipe.id} recipe={recipe}/>)}

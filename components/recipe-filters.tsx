@@ -27,6 +27,7 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
         <Input
           type="text"
           placeholder="Buscar recetas..."
+          aria-label="Buscar recetas"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           className="pl-10 font-mono"
@@ -40,7 +41,7 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
             <Badge
               key={tag}
               variant={selectedTags.includes(tag) ? "default" : "outline"}
-              className="cursor-pointer font-mono"
+              className="cursor-pointer font-mono transition-colors duration-150"
               onClick={() => onTagClick(tag)}
             >
               {tag}
