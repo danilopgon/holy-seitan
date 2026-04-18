@@ -41,7 +41,7 @@ There is no test suite in the project.
 
 ### Directory Layout
 
-```
+```text
 app/           # Next.js App Router pages
   page.tsx     # Home (public recipe grid)
   login/       # Auth page

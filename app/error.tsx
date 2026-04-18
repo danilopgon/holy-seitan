@@ -2,10 +2,13 @@
 'use client'
 
 export default function Error({error, reset}: { error: Error; reset: () => void }) {
+    const isDev = process.env.NODE_ENV === 'development'
     return (
         <main className="container mx-auto px-4 py-16 text-center">
             <h1 className="text-2xl font-mono font-semibold tracking-tight text-foreground mb-3">Algo fue mal</h1>
-            <p className="text-sm text-muted-foreground mb-8">{error.message}</p>
+            <p className="text-sm text-muted-foreground mb-8">
+                {isDev ? error.message : "Ha ocurrido un error inesperado"}
+            </p>
             <button
                 className="font-mono text-sm text-primary underline hover:text-primary/80 transition-colors"
                 type="button"
