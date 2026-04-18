@@ -44,7 +44,7 @@ export default function LoginPage() {
         <main className="container mx-auto px-4 py-16 flex items-center justify-center">
             <Card className="w-full max-w-md">
                 <CardHeader>
-                    <CardTitle className="font-mono text-2xl">Acceso Admin</CardTitle>
+                    <CardTitle className="font-mono text-2xl tracking-tight">Acceso Admin</CardTitle>
                     <CardDescription>Inicia sesión para gestionar recetas</CardDescription>
                 </CardHeader>
                 <CardContent>

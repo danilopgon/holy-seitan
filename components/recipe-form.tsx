@@ -72,7 +72,7 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle className="font-mono">Información Básica</CardTitle>
+          <CardTitle className="font-mono font-semibold tracking-tight">Información Básica</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
@@ -152,7 +152,7 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-mono">Detalles de la Receta</CardTitle>
+          <CardTitle className="font-mono font-semibold tracking-tight">Detalles de la Receta</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -247,7 +247,7 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
                   className="bg-primary text-primary-foreground px-3 py-1 rounded-md flex items-center gap-2 font-mono text-sm"
                 >
                   {tag}
-                  <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-destructive">
+                  <button type="button" onClick={() => handleRemoveTag(tag)} className="hover:text-destructive transition-colors" aria-label={`Eliminar etiqueta ${tag}`}>
                     <X className="h-3 w-3" />
                   </button>
                 </div>
@@ -259,7 +259,7 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle className="font-mono">Contenido de la Receta (Markdown)</CardTitle>
+          <CardTitle className="font-mono font-semibold tracking-tight">Contenido de la Receta (Markdown)</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="edit" className="w-full">

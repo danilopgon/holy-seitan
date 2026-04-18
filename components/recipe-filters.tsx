@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+import { badgeVariants } from "@/components/ui/badge"
 import { Search } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface RecipeFiltersProps {
   onSearchChange: (search: string) => void
@@ -27,6 +28,7 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
         <Input
           type="text"
           placeholder="Buscar recetas..."
+          aria-label="Buscar recetas"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
           className="pl-10 font-mono"
@@ -37,14 +39,18 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
         <p className="text-sm font-mono text-muted-foreground mb-2">Filtrar por etiquetas:</p>
         <div className="flex flex-wrap gap-2">
           {availableTags.map((tag) => (
-            <Badge
+            <button
               key={tag}
-              variant={selectedTags.includes(tag) ? "default" : "outline"}
-              className="cursor-pointer font-mono"
+              type="button"
               onClick={() => onTagClick(tag)}
+              aria-pressed={selectedTags.includes(tag)}
+              className={cn(
+                badgeVariants({ variant: selectedTags.includes(tag) ? "default" : "outline" }),
+                "cursor-pointer font-mono transition-colors duration-150"
+              )}
             >
               {tag}
-            </Badge>
+            </button>
           ))}
         </div>
       </div>

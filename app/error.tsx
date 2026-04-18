@@ -2,11 +2,18 @@
 'use client'
 
 export default function Error({error, reset}: { error: Error; reset: () => void }) {
+    const isDev = process.env.NODE_ENV === 'development'
     return (
-        <main className="p-6">
-            <h1 className="text-xl font-semibold">Algo fue mal</h1>
-            <p className="mt-2 text-sm opacity-80">{error.message}</p>
-            <button className="mt-4 underline" type="button" onClick={() => reset()}>
+        <main className="container mx-auto px-4 py-16 text-center">
+            <h1 className="text-2xl font-mono font-semibold tracking-tight text-foreground mb-3">Algo fue mal</h1>
+            <p className="text-sm text-muted-foreground mb-8">
+                {isDev ? error.message : "Ha ocurrido un error inesperado"}
+            </p>
+            <button
+                className="font-mono text-sm text-primary underline hover:text-primary/80 transition-colors"
+                type="button"
+                onClick={() => reset()}
+            >
                 Reintentar
             </button>
         </main>

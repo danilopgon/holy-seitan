@@ -11,37 +11,37 @@ interface MarkdownRendererProps {
 
 const components: Components = {
   h1: ({ children }) => (
-    <h1 className='text-3xl font-mono font-bold text-foreground mb-4 mt-8 first:mt-0'>
+    <h1 className='text-3xl font-mono font-bold tracking-tight leading-tight mb-4 mt-8 first:mt-0'>
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className='text-2xl font-mono font-bold text-foreground mb-3 mt-6'>
+    <h2 className='text-2xl font-mono font-semibold tracking-tight leading-tight mb-3 mt-8'>
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className='text-xl font-mono font-bold text-foreground mb-2 mt-4'>
+    <h3 className='text-lg font-mono font-semibold leading-snug mb-2 mt-5'>
       {children}
     </h3>
   ),
   p: ({ children }) => (
-    <p className='text-foreground leading-relaxed mb-4'>{children}</p>
+    <p className='leading-relaxed mb-4'>{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className='list-disc list-inside space-y-2 mb-4 text-foreground'>
+    <ul className='list-disc list-outside pl-6 space-y-1.5 mb-4'>
       {children}
     </ul>
   ),
   ol: ({ children }) => (
-    <ol className='list-decimal list-inside space-y-2 mb-4 text-foreground'>
+    <ol className='list-decimal list-outside pl-6 space-y-1.5 mb-4'>
       {children}
     </ol>
   ),
-  li: ({ children }) => <li className='leading-relaxed'>{children}</li>,
+  li: ({ children }) => <li className='leading-relaxed pl-1'>{children}</li>,
 
   strong: ({ children }) => (
-    <strong className='font-bold text-foreground'>{children}</strong>
+    <strong className='font-semibold'>{children}</strong>
   ),
   em: ({ children }) => <em className='italic'>{children}</em>,
   code: ({ children }) => (
@@ -67,12 +67,12 @@ const components: Components = {
     <tr className='hover:bg-muted/40 transition-colors'>{children}</tr>
   ),
   th: ({ children }) => (
-    <th className='text-left font-mono font-bold text-foreground px-4 py-2 whitespace-nowrap'>
+    <th className='text-left font-mono font-semibold px-4 py-2 whitespace-nowrap'>
       {children}
     </th>
   ),
   td: ({ children }) => (
-    <td className='text-foreground px-4 py-2 border-b border-border/50 whitespace-nowrap'>
+    <td className='px-4 py-2 border-b border-border/50 tabular-nums'>
       {children}
     </td>
   ),
