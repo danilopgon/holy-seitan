@@ -1,6 +1,6 @@
 "use client"
 
-import type {MouseEvent} from "react"
+import {useState, type MouseEvent} from "react"
 import Link from "next/link"
 import {useRouter} from "next/navigation"
 import {Clock, Users, ChefHat} from "lucide-react"
@@ -16,6 +16,7 @@ interface RecipeCardProps {
 export function RecipeCard({recipe}: RecipeCardProps) {
 	const router = useRouter()
 	const totalTime = recipe.prepTime + recipe.cookTime
+	const [isNavigating, setIsNavigating] = useState(false)
 
 	const handleTransitionNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
 		if (
@@ -30,6 +31,7 @@ export function RecipeCard({recipe}: RecipeCardProps) {
 		}
 
 		event.preventDefault()
+		setIsNavigating(true)
 		startViewTransitionIfAvailable(() => {
 			router.push(`/recipe/${recipe.slug}`)
 		})
@@ -39,7 +41,7 @@ export function RecipeCard({recipe}: RecipeCardProps) {
 		<Link href={`/recipe/${recipe.slug}`} onClick={handleTransitionNavigation}>
 			<Card className="overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200 ease-out h-full">
 				<div className="relative h-36 w-full bg-muted flex items-center justify-center">
-					<span style={{viewTransitionName: getEmojiTransitionName(recipe.slug)}}>
+					<span style={{viewTransitionName: isNavigating ? getEmojiTransitionName() : "none"}}>
 						<span className="text-6xl" role="img" aria-label={recipe.title}>
 							{recipe.emoji}
 						</span>

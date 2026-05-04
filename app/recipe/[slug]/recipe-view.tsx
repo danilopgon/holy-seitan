@@ -57,8 +57,8 @@ export function RecipeView({recipe}: { recipe: Recipe }) {
                 </div>
 
                 <div className="relative h-60 w-full rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-                    <span style={{viewTransitionName: getEmojiTransitionName(recipe.slug)}}>
-                        <span className="text-[8rem] animate-in zoom-in-95 fade-in-0 duration-300 ease-out" role="img" aria-label={recipe.title}>
+                    <span style={{viewTransitionName: getEmojiTransitionName()}}>
+                        <span className="text-[8rem] emoji-fallback-enter" role="img" aria-label={recipe.title}>
                             {recipe.emoji}
                         </span>
                     </span>

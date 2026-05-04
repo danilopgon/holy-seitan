@@ -17,6 +17,6 @@ export function startViewTransitionIfAvailable(updateCallback: () => void) {
 	document.startViewTransition(updateCallback)
 }
 
-export function getEmojiTransitionName(slug: string) {
-	return `recipe-emoji-${slug}`
+export function getEmojiTransitionName() {
+	return "recipe-emoji-shared"
 }

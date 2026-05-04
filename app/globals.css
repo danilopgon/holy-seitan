@@ -132,3 +132,25 @@
     scroll-behavior: auto !important;
   }
 }
+
+
+::view-transition-old(recipe-emoji-shared),
+::view-transition-new(recipe-emoji-shared) {
+  animation-duration: 420ms;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@keyframes emoji-fallback-enter {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.emoji-fallback-enter {
+  animation: emoji-fallback-enter 280ms ease-out both;
+}
