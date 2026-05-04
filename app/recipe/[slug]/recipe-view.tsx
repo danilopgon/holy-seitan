@@ -6,6 +6,7 @@ import {MarkdownRenderer} from "@/components/markdown-renderer"
 import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
 import type {Recipe} from "@/core/models/recipe"
+import {getEmojiTransitionName} from "@/lib/view-transition"
 
 export function RecipeView({recipe}: { recipe: Recipe }) {
     const totalTime = recipe.prepTime + recipe.cookTime
@@ -56,8 +57,10 @@ export function RecipeView({recipe}: { recipe: Recipe }) {
                 </div>
 
                 <div className="relative h-60 w-full rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-                    <span className="text-[8rem] animate-in zoom-in-95 fade-in-0 duration-300 ease-out" role="img" aria-label={recipe.title}>
-                        {recipe.emoji}
+                    <span style={{viewTransitionName: getEmojiTransitionName(recipe.slug)}}>
+                        <span className="text-[8rem] animate-in zoom-in-95 fade-in-0 duration-300 ease-out" role="img" aria-label={recipe.title}>
+                            {recipe.emoji}
+                        </span>
                     </span>
                 </div>
             </div>
