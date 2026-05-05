@@ -5,7 +5,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "next lint",
+    "lint": "biome lint app/page.tsx \"app/recipe/[slug]/recipe-view.tsx\" components/recipe-card.tsx components/ui/chart.tsx components/ui/resizable.tsx lib/view-transition.ts next.config.mjs",
     "start": "next start"
   },
   "dependencies": {
