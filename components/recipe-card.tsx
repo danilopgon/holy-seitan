@@ -1,51 +1,36 @@
 "use client"
 
-import {useState, type MouseEvent} from "react"
+import {ViewTransition} from "react"
 import Link from "next/link"
-import {useRouter} from "next/navigation"
 import {Clock, Users, ChefHat} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
 import type {Recipe} from "@/core/models/recipe"
-import {getEmojiTransitionName, startViewTransitionIfAvailable} from "@/lib/view-transition"
+import {getEmojiTransitionName} from "@/lib/view-transition"
 
 interface RecipeCardProps {
 	recipe: Recipe
+	index?: number
 }
 
-export function RecipeCard({recipe}: RecipeCardProps) {
-	const router = useRouter()
+export function RecipeCard({recipe, index}: RecipeCardProps) {
 	const totalTime = recipe.prepTime + recipe.cookTime
-	const [isNavigating, setIsNavigating] = useState(false)
-
-	const handleTransitionNavigation = (event: MouseEvent<HTMLAnchorElement>) => {
-		if (
-			event.defaultPrevented ||
-			event.button !== 0 ||
-			event.metaKey ||
-			event.ctrlKey ||
-			event.shiftKey ||
-			event.altKey
-		) {
-			return
-		}
-
-		event.preventDefault()
-		setIsNavigating(true)
-		startViewTransitionIfAvailable(() => {
-			router.push(`/recipe/${recipe.slug}`)
-		})
-	}
 
 	return (
-		<Link href={`/recipe/${recipe.slug}`} onClick={handleTransitionNavigation}>
+		<Link
+			href={`/recipe/${recipe.slug}`}
+			style={index !== undefined ? {
+				animation: 'recipe-fade-up 350ms cubic-bezier(0.22, 1, 0.36, 1) both',
+				animationDelay: `${index * 40}ms`,
+			} : undefined}
+		>
 			<Card className="overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200 ease-out h-full">
 				<div className="relative h-36 w-full bg-muted flex items-center justify-center">
-					<span style={{viewTransitionName: isNavigating ? getEmojiTransitionName() : "none"}}>
+					<ViewTransition name={getEmojiTransitionName(recipe.slug)}>
 						<span className="text-6xl" role="img" aria-label={recipe.title}>
 							{recipe.emoji}
 						</span>
-					</span>
+					</ViewTransition>
 				</div>
 				<CardHeader>
 					<CardTitle className="font-mono text-lg font-semibold tracking-tight line-clamp-1">{recipe.title}</CardTitle>

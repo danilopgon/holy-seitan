@@ -134,23 +134,26 @@
 }
 
 
-::view-transition-old(recipe-emoji-shared),
-::view-transition-new(recipe-emoji-shared) {
+::view-transition-old(*),
+::view-transition-new(*) {
   animation-duration: 420ms;
   animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-@keyframes emoji-fallback-enter {
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@keyframes recipe-fade-up {
   from {
-    transform: scale(0.9);
     opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: scale(1);
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.emoji-fallback-enter {
-  animation: emoji-fallback-enter 280ms ease-out both;
-}
