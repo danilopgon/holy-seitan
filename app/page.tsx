@@ -72,10 +72,10 @@ export default function HomePage() {
             </div>
 
             {/* Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in-0 duration-500">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {isLoading
                     ? skeletonKeys.map((key) => <RecipeCardSkeleton key={key}/>)
-                    : filteredRecipes.map((recipe) => <RecipeCard key={recipe.id} recipe={recipe}/>)}
+                    : filteredRecipes.map((recipe, index) => <RecipeCard key={recipe.id} recipe={recipe} index={index}/>)}
             </div>
 
             {/* Empty state (solo cuando ya cargó) */}
