@@ -3,7 +3,7 @@
 **Holy Seitan** es el recetario vegano en Markdown de [María López Herráiz](https://github.com/mloherr) y [Dani López González](https://github.com/danilopgon).  
 Cada receta se escribe en formato `.md`, se guarda en Supabase y se muestra directamente en la web, con un panel de administración y sistema de login.
 
-> A María el Notion free le dijo “hasta aquí”... y en lugar de pagar el plan, hicimos esto. 🤷‍♂️
+> A María el Notion free le dijo “hasta aquí”... y en lugar de pagar el plan, hicimos esta movida 🤷‍♂️
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/1f696553-ae1a-4bfb-aaa3-0725e43a2b8d" />
 
