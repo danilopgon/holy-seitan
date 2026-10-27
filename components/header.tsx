@@ -6,6 +6,9 @@ import {Button} from "@/components/ui/button"
 import {LogOut} from "lucide-react"
 import {useRouter} from "next/navigation";
 
+const navLink =
+    "inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-1 text-sm font-mono hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+
 export function Header() {
     const {user, logout} = useAuthStore()
     const router = useRouter()
@@ -18,19 +21,20 @@ export function Header() {
 
     return (
         <header className="border-b border-border bg-card">
-            <div className="container mx-auto px-4 py-4">
-                <div className="flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2">
-                        <span className="text-2xl font-mono font-bold text-foreground">🌱 Holy Seitan</span>
+            <div className="container mx-auto max-w-6xl px-4 py-4">
+                <div className="flex items-center justify-between gap-4">
+                    <Link href="/" className="flex items-center gap-2 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
+                        <span className="font-emoji text-xl sm:text-2xl text-primary" aria-hidden="true">🌱</span>
+                        <span className="whitespace-nowrap text-xl sm:text-2xl font-mono font-bold text-foreground">Holy Seitan</span>
                     </Link>
 
-                    <nav className="flex items-center gap-4">
-                        <Link href="/" className="text-sm font-mono hover:text-primary transition-colors">
+                    <nav className="flex items-center gap-3 sm:gap-4">
+                        <Link href="/" className={`${navLink} max-sm:hidden`}>
                             Recetas
                         </Link>
                         {user?.isAdmin ? (
                             <>
-                                <Link href="/admin" className="text-sm font-mono hover:text-primary transition-colors">
+                                <Link href="/admin" className={navLink}>
                                     Admin
                                 </Link>
                                 <Button variant="ghost" size="sm" onClick={logoutAndNavigate} className="font-mono">
@@ -39,10 +43,8 @@ export function Header() {
                                 </Button>
                             </>
                         ) : (
-                            <Link href="/login">
-                                <Button variant="outline" size="sm" className="font-mono bg-transparent">
-                                    Acceso Admin
-                                </Button>
+                            <Link href="/login" className={`${navLink} text-muted-foreground`}>
+                                Acceso Admin
                             </Link>
                         )}
                     </nav>

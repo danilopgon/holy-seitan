@@ -2,12 +2,15 @@ import {Analytics} from "@vercel/analytics/next"
 import {GeistMono} from "geist/font/mono"
 import {GeistSans} from "geist/font/sans"
 import type {Metadata} from "next"
+import {Noto_Emoji} from "next/font/google"
 import type React from "react"
 import {Suspense} from "react"
 import "./globals.css"
 import {Footer} from "@/components/footer";
 import {Header} from "@/components/header";
 import {RecipesProvider} from "@/lib/providers/recipes-provider";
+
+const notoEmoji = Noto_Emoji({subsets: ["emoji"], weight: "variable", variable: "--font-noto-emoji"})
 
 export const metadata: Metadata = {
     title: "Holy Seitan — Recetario Vegano de María y Dani",
@@ -22,8 +25,8 @@ export default function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="en">
-        <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+        <html lang="es">
+        <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${notoEmoji.variable}`}>
         <Suspense fallback={null}>
             <div className="min-h-screen bg-background">
                 <Header/>

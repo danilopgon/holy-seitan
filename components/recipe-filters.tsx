@@ -31,12 +31,12 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
           aria-label="Buscar recetas"
           value={search}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="pl-10 font-mono"
+          className="pl-10"
         />
       </div>
 
       <div>
-        <p className="text-sm font-mono text-muted-foreground mb-2">Filtrar por etiquetas:</p>
+        <p className="text-sm text-muted-foreground mb-2">Filtrar por etiquetas:</p>
         <div className="flex flex-wrap gap-2">
           {availableTags.map((tag) => (
             <button
@@ -46,7 +46,7 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
               aria-pressed={selectedTags.includes(tag)}
               className={cn(
                 badgeVariants({ variant: selectedTags.includes(tag) ? "default" : "outline" }),
-                "cursor-pointer font-mono transition-colors duration-150"
+                "min-h-8 px-3 cursor-pointer font-mono transition-colors duration-150"
               )}
             >
               {tag}

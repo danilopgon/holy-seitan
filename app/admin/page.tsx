@@ -18,6 +18,7 @@ import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardTitle} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import type {Recipe} from "@/core/models/recipe"
+import {getEmojiTile} from "@/lib/emoji-tile"
 import {useRecipeStore} from "@/lib/store/recipe-store"
 
 type ViewMode = "list" | "create" | "edit"
@@ -93,12 +94,12 @@ export default function AdminPage() {
                 <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-3xl font-mono font-bold tracking-tight leading-tight text-foreground mb-2">Panel de Administración</h1>
-                        <p className="text-muted-foreground">
-                            Gestiona tu colección de recetas
-                            {viewMode === "list" && (
-                                <> • <span className="font-mono">{filtered.length}</span> resultados</>
-                            )}
-                        </p>
+                        <p className="text-muted-foreground">Gestiona tu colección de recetas</p>
+                        {viewMode === "list" && (
+                            <p className="text-sm text-muted-foreground mt-1">
+                                <span className="font-mono tabular-nums">{filtered.length}</span> resultados
+                            </p>
+                        )}
                     </div>
 
                     {viewMode === "list" && (
@@ -111,7 +112,7 @@ export default function AdminPage() {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     placeholder="Buscar por título o descripción…"
-                                    className="pl-9 font-mono"
+                                    className="pl-9"
                                     aria-label="Buscar recetas"
                                 />
                             </div>
@@ -146,7 +147,7 @@ export default function AdminPage() {
                     ) : (
                         filtered.length === 0 ? (
                             <div className="text-center py-16 border border-dashed rounded-lg">
-                                <p className="text-muted-foreground font-mono">
+                                <p className="text-muted-foreground">
                                     No hay recetas que coincidan con “{searchQuery}”.
                                 </p>
                             </div>
@@ -158,7 +159,8 @@ export default function AdminPage() {
                                             <div
                                                 className="flex gap-6 flex-col md:flex-row">
                                                 <div
-                                                    className="h-32 w-32 flex-shrink-0 rounded-lg bg-muted flex items-center justify-center text-7xl">
+                                                    className="h-32 w-32 flex-shrink-0 rounded-lg flex items-center justify-center font-emoji text-7xl"
+                                                    data-tile={getEmojiTile(recipe.slug)}>
                                                     {recipe.emoji}
                                                 </div>
                                                 <div className="flex-1">
@@ -167,11 +169,9 @@ export default function AdminPage() {
                                                     <CardDescription
                                                         className="mb-4">{recipe.description}</CardDescription>
                                                     <div
-                                                        className="flex gap-2 text-sm text-muted-foreground font-mono">
+                                                        className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground font-mono tabular-nums">
                                                         <span>{recipe.prepTime + recipe.cookTime}m</span>
-                                                        <span>•</span>
                                                         <span>{recipe.servings} porciones</span>
-                                                        <span>•</span>
                                                         <span>{recipe.difficulty}</span>
                                                     </div>
                                                 </div>
