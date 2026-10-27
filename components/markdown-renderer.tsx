@@ -85,7 +85,7 @@ export function MarkdownRenderer({
   return (
     <div
       className={cn(
-        'prose prose-neutral dark:prose-invert max-w-none',
+        'prose prose-neutral dark:prose-invert max-w-none [&>:first-child]:mt-0',
         className,
       )}
     >

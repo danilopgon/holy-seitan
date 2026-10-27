@@ -7,6 +7,7 @@ import {MarkdownRenderer} from "@/components/markdown-renderer"
 import {Badge} from "@/components/ui/badge"
 import {Button} from "@/components/ui/button"
 import type {Recipe} from "@/core/models/recipe"
+import {getEmojiTile} from "@/lib/emoji-tile"
 import {getEmojiTransitionName} from "@/lib/view-transition"
 
 export function RecipeView({recipe}: { recipe: Recipe }) {
@@ -66,9 +67,9 @@ export function RecipeView({recipe}: { recipe: Recipe }) {
                     ))}
                 </div>
 
-                <div className="relative h-60 w-full rounded-lg overflow-hidden bg-muted flex items-center justify-center" style={entrance(0)}>
+                <div className="relative h-60 w-full rounded-lg overflow-hidden flex items-center justify-center" data-tile={getEmojiTile(recipe.slug)} style={entrance(0)}>
                     <ViewTransition name={getEmojiTransitionName(recipe.slug)}>
-                        <span className="text-[8rem]" role="img" aria-label={recipe.title}>
+                        <span className="font-emoji text-[8rem]" role="img" aria-label={recipe.title}>
                             {recipe.emoji}
                         </span>
                     </ViewTransition>
@@ -76,13 +77,13 @@ export function RecipeView({recipe}: { recipe: Recipe }) {
             </div>
 
             <div className="bg-card border border-border rounded-lg p-8" style={entrance(120)}>
-                <MarkdownRenderer content={recipe.content}/>
+                <MarkdownRenderer content={recipe.content} className="max-w-[68ch]"/>
             </div>
 
             <div className="mt-8 pt-6 border-t border-border" style={entrance(120)}>
-                <p className="text-sm text-muted-foreground font-mono">
-                    Receta por {recipe.author} • Última actualización{" "}
-                    {new Date(recipe.updatedAt).toLocaleDateString("es-ES")}
+                <p className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-muted-foreground">
+                    <span>Receta por {recipe.author}</span>
+                    <span>Actualizada el {new Date(recipe.updatedAt).toLocaleDateString("es-ES")}</span>
                 </p>
             </div>
         </main>

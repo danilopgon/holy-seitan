@@ -84,7 +84,6 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
               value={formData.title}
               onChange={(e) => handleChange("title", e.target.value)}
               required
-              className="font-mono"
             />
           </div>
 
@@ -110,7 +109,6 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
               value={formData.description}
               onChange={(e) => handleChange("description", e.target.value)}
               required
-              className="font-mono"
               rows={3}
             />
           </div>
@@ -125,7 +123,7 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
                 value={formData.emoji}
                 onChange={(e) => handleChange("emoji", e.target.value)}
                 placeholder="🍽️"
-                className="font-mono text-4xl text-center w-24 h-24"
+                className="font-emoji text-4xl text-center w-24 h-24 text-primary"
                 maxLength={2}
               />
               <div className="text-sm text-muted-foreground">
@@ -144,7 +142,6 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
               value={formData.author}
               onChange={(e) => handleChange("author", e.target.value)}
               required
-              className="font-mono"
             />
           </div>
         </CardContent>
@@ -234,7 +231,6 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
                   }
                 }}
                 placeholder="Agregar una etiqueta"
-                className="font-mono"
               />
               <Button type="button" onClick={handleAddTag} variant="outline" className="font-mono bg-transparent">
                 Agregar

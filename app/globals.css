@@ -1,3 +1,9 @@
+/* Hallmark · checked: 2026-10-27 · genre: editorial (inferred)
+ * fixed: 7b, 22, 34, 40, 63, F16, F18, lang · dark mode: issue #7
+ * built: the project · redesign: polish (site), full (/: index-first, latest recipe leads, recipe index rows) · v2.0.0 */
+/* Owner decision: the recipe emoji and the 🌱 wordmark are brand content, drawn in Noto Emoji on a per-recipe tile. Hallmark 30a (Floor) stays open on purpose.
+ * Geist Mono is the brand voice too: nav, buttons, labels, heads, figures and tags; sentences and free text in Geist Sans (Hallmark 64 open on purpose). */
+
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -5,23 +11,23 @@
 
 :root {
   --background: oklch(0.99 0.004 145);
-  --foreground: oklch(0.15 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0 0);
+  --foreground: oklch(0.17 0.012 145);
+  --card: oklch(0.995 0.004 145);
+  --card-foreground: oklch(0.17 0.012 145);
+  --popover: oklch(0.995 0.004 145);
+  --popover-foreground: oklch(0.17 0.012 145);
   --primary: oklch(0.42 0.12 145); /* Earthy sage green — readable on white */
-  --primary-foreground: oklch(0.98 0 0);
+  --primary-foreground: oklch(0.985 0.006 145);
   --secondary: oklch(0.94 0.01 145);
-  --secondary-foreground: oklch(0.2 0 0);
+  --secondary-foreground: oklch(0.22 0.012 145);
   --muted: oklch(0.95 0.007 145);
-  --muted-foreground: oklch(0.5 0 0);
+  --muted-foreground: oklch(0.48 0.015 145);
   --accent: oklch(0.93 0.025 145); /* Subtle green blush — hover states, not a second button */
-  --accent-foreground: oklch(0.2 0 0);
+  --accent-foreground: oklch(0.22 0.012 145);
   --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.98 0 0);
+  --destructive-foreground: oklch(0.985 0.006 145);
   --border: oklch(0.88 0.008 145);
-  --input: oklch(0.88 0.008 145);
+  --input: oklch(0.62 0.02 145); /* Field edges at 3:1 against the page */
   --ring: oklch(0.42 0.12 145);
   --chart-1: oklch(0.42 0.12 145);
   --chart-2: oklch(0.6 0.118 184.704);
@@ -30,13 +36,24 @@
   --chart-5: oklch(0.769 0.188 70.08);
   --radius: 0.5rem;
   --sidebar: oklch(0.97 0.006 145);
-  --sidebar-foreground: oklch(0.15 0 0);
+  --sidebar-foreground: oklch(0.17 0.012 145);
   --sidebar-primary: oklch(0.42 0.12 145);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0.006 145);
   --sidebar-accent: oklch(0.93 0.025 145);
-  --sidebar-accent-foreground: oklch(0.2 0 0);
+  --sidebar-accent-foreground: oklch(0.22 0.012 145);
   --sidebar-border: oklch(0.88 0.008 145);
   --sidebar-ring: oklch(0.42 0.12 145);
+  /* Emoji tiles: one earthy tint per recipe, the emoji drawn in the same hue */
+  --tile-1-bg: oklch(0.93 0.035 145);
+  --tile-1-fg: oklch(0.42 0.09 145);
+  --tile-2-bg: oklch(0.93 0.035 110);
+  --tile-2-fg: oklch(0.42 0.08 110);
+  --tile-3-bg: oklch(0.93 0.04 75);
+  --tile-3-fg: oklch(0.44 0.09 65);
+  --tile-4-bg: oklch(0.92 0.035 55);
+  --tile-4-fg: oklch(0.42 0.09 50);
+  --tile-5-bg: oklch(0.93 0.03 190);
+  --tile-5-fg: oklch(0.42 0.07 190);
 }
 
 .dark {
@@ -77,6 +94,7 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-emoji: var(--font-noto-emoji);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -119,9 +137,31 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html,
+  body {
+    overflow-x: clip;
+  }
+  html {
+    scrollbar-color: var(--border) var(--background);
+  }
   body {
     @apply bg-background text-foreground;
   }
+  ::selection {
+    background: var(--tile-1-bg);
+    color: var(--tile-1-fg);
+  }
+}
+
+[data-tile="1"] { --tile-bg: var(--tile-1-bg); --tile-fg: var(--tile-1-fg); }
+[data-tile="2"] { --tile-bg: var(--tile-2-bg); --tile-fg: var(--tile-2-fg); }
+[data-tile="3"] { --tile-bg: var(--tile-3-bg); --tile-fg: var(--tile-3-fg); }
+[data-tile="4"] { --tile-bg: var(--tile-4-bg); --tile-fg: var(--tile-4-fg); }
+[data-tile="5"] { --tile-bg: var(--tile-5-bg); --tile-fg: var(--tile-5-fg); }
+
+[data-tile] {
+  background: var(--tile-bg);
+  color: var(--tile-fg);
 }
 
 @media (prefers-reduced-motion: reduce) {

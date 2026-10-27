@@ -6,6 +6,7 @@ import {Clock, Users, ChefHat} from "lucide-react"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Badge} from "@/components/ui/badge"
 import type {Recipe} from "@/core/models/recipe"
+import {getEmojiTile} from "@/lib/emoji-tile"
 import {getEmojiTransitionName} from "@/lib/view-transition"
 
 interface RecipeCardProps {
@@ -24,10 +25,10 @@ export function RecipeCard({recipe, index}: RecipeCardProps) {
 				animationDelay: `${index * 40}ms`,
 			} : undefined}
 		>
-			<Card className="overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200 ease-out h-full">
-				<div className="relative h-36 w-full bg-muted flex items-center justify-center">
+			<Card className="overflow-hidden pt-0 hover:shadow-md hover:-translate-y-0.5 transition-[transform,box-shadow] duration-200 ease-out h-full">
+				<div className="relative h-36 w-full flex items-center justify-center" data-tile={getEmojiTile(recipe.slug)}>
 					<ViewTransition name={getEmojiTransitionName(recipe.slug)}>
-						<span className="text-6xl" role="img" aria-label={recipe.title}>
+						<span className="font-emoji text-6xl" role="img" aria-label={recipe.title}>
 							{recipe.emoji}
 						</span>
 					</ViewTransition>

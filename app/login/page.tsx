@@ -60,7 +60,6 @@ export default function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="font-mono"
                             />
                         </div>
 
@@ -75,14 +74,13 @@ export default function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="font-mono"
                             />
                         </div>
 
                         {error && (
                             <Alert variant="destructive">
                                 <AlertCircle className="h-4 w-4"/>
-                                <AlertDescription className="font-mono">{error}</AlertDescription>
+                                <AlertDescription>{error}</AlertDescription>
                             </Alert>
                         )}
 
