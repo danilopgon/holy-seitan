@@ -27,7 +27,7 @@ There is no test suite in the project.
 
 **Environment setup**: Copy `env.example` to `.env.local` and fill in:
 - `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (the legacy `NEXT_PUBLIC_SUPABASE_ANON_KEY` still works as a fallback until the end of 2026)
 - `DATABASE_URL` (direct Postgres URL for Drizzle, format in `env.example`)
 
 ## Architecture

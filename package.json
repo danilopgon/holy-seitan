@@ -8,7 +8,10 @@
     "lint": "biome lint app/page.tsx \"app/recipe/[slug]/recipe-view.tsx\" components/recipe-card.tsx components/ui/chart.tsx components/ui/resizable.tsx lib/view-transition.ts next.config.mjs",
     "start": "next start",
     "test": "tsx --test \"lib/**/*.test.ts\"",
-    "ingredients:phase0": "tsx scripts/ingredients-phase0.ts"
+    "ingredients:phase0": "tsx scripts/ingredients-phase0.ts",
+    "test:db": "npx -y supabase@2.122.0 test db",
+    "test:functions": "cd supabase/functions/mcp && npx -y deno@2.5.6 test tools/",
+    "mcp:smoke": "tsx scripts/mcp-smoke.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -40,6 +43,7 @@
     "@radix-ui/react-toggle-group": "1.1.11",
     "@radix-ui/react-tooltip": "1.2.8",
     "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "2.118.0",
     "@vercel/analytics": "latest",
     "autoprefixer": "^10.5.0",
     "class-variance-authority": "^0.7.1",

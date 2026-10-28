@@ -18,4 +18,6 @@ export interface Recipe {
     createdAt: string
     updatedAt: string
     isPublished: boolean
+    // Bumped by the database on every update; writes send the one they read (issue #9)
+    version: number
 }

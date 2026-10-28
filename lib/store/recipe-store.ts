@@ -14,8 +14,8 @@ export interface RecipeStore {
     setInitialized: (v: boolean) => void
     loadRecipes: () => Promise<void>
     getRecipeBySlug: (slug: string) => Promise<Recipe | undefined>
-    addRecipe: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">) => Promise<void>
-    updateRecipe: (id: string, recipe: Partial<Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">>) => Promise<void>
+    addRecipe: (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author" | "version">) => Promise<void>
+    updateRecipe: (id: string, recipe: Partial<Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author" | "version">>) => Promise<void>
     deleteRecipe: (id: string) => Promise<void>
 }
 
@@ -80,16 +80,23 @@ export const useRecipeStore = create<RecipeStore>((set, get) => ({
         const supabase = supabaseBrowser()
 
         const payload = recipeToDtoPayloadPartial(updates)
+        // Only write over the version this panel loaded; an agent (MCP) may have changed it since
+        const expectedVersion = get().recipes.find((r) => r.id === id)?.version ?? 1
 
         const {data, error} = await supabase
             .from("recipes")
             .update(payload)
             .eq("id", id)
+            .eq("version", expectedVersion)
             .select("*")
             .maybeSingle<RecipeDTO>()
 
         if (error) throw error
         if (!data) {
+            const {data: current} = await supabase.from("recipes").select("version").eq("id", id).maybeSingle<{ version: number }>()
+            if (current && current.version !== expectedVersion) {
+                throw new Error("La receta ha cambiado mientras la editabas (quizá desde un agente). Recarga la página y vuelve a aplicar tus cambios.")
+            }
             throw new Error("No se encontró la receta o no tienes permisos (RLS).")
         }
 

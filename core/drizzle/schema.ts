@@ -25,6 +25,7 @@ const recipes = pgTable("recipes", {
     tags: text("tags").array(),
 
     isPublished: boolean("is_published").notNull().default(true),
+    version: integer("version").notNull().default(1),
 
     createdBy: uuid("created_by").notNull(),
     createdAt: timestamp("created_at").notNull().default(sql`now

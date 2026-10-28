@@ -2,6 +2,7 @@
 
 import {Pencil, Plus, Trash2, Search} from "lucide-react"
 import {useMemo, useState} from "react"
+import {OAuthConnections} from "@/components/oauth-connections"
 import {ProtectedRoute} from "@/components/protected-route"
 import {RecipeForm} from "@/components/recipe-form"
 import {
@@ -33,14 +34,18 @@ export default function AdminPage() {
     const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null)
     const [recipeToDelete, setRecipeToDelete] = useState<Recipe | null>(null)
     const [busy, setBusy] = useState(false)
+    const [saveError, setSaveError] = useState<string | null>(null)
     const [searchQuery, setSearchQuery] = useState("")
     const skeletonKeys = ["sk1", "sk2", "sk3"]
 
     const handleCreate = async (recipe: Omit<Recipe, "id" | "createdAt" | "updatedAt">) => {
         try {
             setBusy(true)
+            setSaveError(null)
             await addRecipe(recipe)
             setViewMode("list")
+        } catch (error) {
+            setSaveError(error instanceof Error ? error.message : "No se ha podido guardar la receta.")
         } finally {
             setBusy(false)
         }
@@ -50,9 +55,12 @@ export default function AdminPage() {
         if (!selectedRecipe) return
         try {
             setBusy(true)
+            setSaveError(null)
             await updateRecipe(selectedRecipe.id, recipe)
             setViewMode("list")
             setSelectedRecipe(null)
+        } catch (error) {
+            setSaveError(error instanceof Error ? error.message : "No se ha podido guardar la receta.")
         } finally {
             setBusy(false)
         }
@@ -206,6 +214,12 @@ export default function AdminPage() {
                     )
                 )}
 
+                {saveError && viewMode !== "list" && (
+                    <p role="alert" className="mb-6 rounded-lg border border-destructive p-4 text-sm text-destructive">
+                        {saveError}
+                    </p>
+                )}
+
                 {viewMode === "create" && (
                     <div>
                         <h2 className="text-2xl font-mono font-semibold tracking-tight text-foreground mb-6">Crear Nueva Receta</h2>
@@ -227,6 +241,7 @@ export default function AdminPage() {
                         />
                     </div>
                 )}
+                {viewMode === "list" && <OAuthConnections/>}
             </main>
 
             <AlertDialog open={!!recipeToDelete} onOpenChange={() => setRecipeToDelete(null)}>
