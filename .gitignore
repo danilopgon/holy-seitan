@@ -27,3 +27,10 @@ yarn-error.log*
 next-env.d.ts
 # ingredient migration backups and reports (issue #7)
 .migration/
+
+# Supabase local: signing key, function secrets, CLI state, local seed
+supabase/signing_keys.json
+supabase/functions/.env
+supabase/.temp/
+supabase/.branches/
+supabase/seed.sql

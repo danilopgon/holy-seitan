@@ -120,20 +120,23 @@ file_size_limit = "50MiB"
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://127.0.0.1:3000"
+site_url = "http://localhost:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://127.0.0.1:3000"]
+additional_redirect_urls = ["http://localhost:3000", "https://holy-seitan.danilopgon.com"]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
 # Path to JWT signing key. DO NOT commit your signing keys file to git.
-# signing_keys_path = "./signing_keys.json"
+# Local only (gitignored): `npx supabase gen signing-key --algorithm ES256 > supabase/signing_keys.json`.
+# The MCP server rejects HS256 tokens; production uses its own ES256 key from the dashboard.
+signing_keys_path = "./signing_keys.json"
 # If disabled, the refresh token will never expire.
 enable_refresh_token_rotation = true
 # Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.
 # Requires enable_refresh_token_rotation = true.
 refresh_token_reuse_interval = 10
 # Allow/disallow new user signups to your project.
-enable_signup = true
+# Only the two existing accounts may sign in (issue #9); MCP clients connect to them, they never create users.
+enable_signup = false
 # Allow/disallow anonymous sign-ins to your project.
 enable_anonymous_sign_ins = false
 # Allow/disallow testing manual linking of accounts
@@ -167,7 +170,8 @@ web3 = 30
 # secret = ""
 
 [auth.email]
-# Allow/disallow new user signups via email to your project.
+# Despite its name, false here turns the email provider off and blocks sign-in for the existing accounts.
+# Sign-ups are closed by [auth] enable_signup = false instead.
 enable_signup = true
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
@@ -306,12 +310,13 @@ enabled = false
 
 # OAuth server configuration
 [auth.oauth_server]
-# Enable OAuth server functionality
-enabled = false
+# Enable OAuth server functionality (MCP clients sign in through it, issue #9)
+enabled = true
 # Path for OAuth consent flow UI
 authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
-allow_dynamic_registration = false
+# MCP clients register themselves; registering grants nothing without a sign-in and consent
+allow_dynamic_registration = true
 
 [edge_runtime]
 enabled = true
@@ -345,3 +350,8 @@ s3_region = "env(S3_REGION)"
 s3_access_key = "env(S3_ACCESS_KEY)"
 # Configures AWS_SECRET_ACCESS_KEY for S3 bucket
 s3_secret_key = "env(S3_SECRET_KEY)"
+
+# MCP server for agents (issue #9). The function verifies OAuth tokens itself; the gateway check must be off
+# so clients can reach the discovery metadata and get a 401 challenge.
+[functions.mcp]
+verify_jwt = false

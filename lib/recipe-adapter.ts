@@ -31,13 +31,14 @@ export function dtoToRecipe(dto: RecipeDTO, author: string): Recipe {
         author,
         createdAt: new Date(dto.created_at).toISOString(),
         updatedAt: new Date(dto.updated_at).toISOString(),
-        isPublished: dto.is_published
+        isPublished: dto.is_published,
+        version: dto.version ?? 1,
     }
 }
 
 export function recipeToDtoPayload(
-    r: Omit<Recipe, "id" | "author" | "createdAt" | "updatedAt">,
-): Omit<RecipeDTO, "id" | "created_by" | "created_at" | "updated_at"> {
+    r: Omit<Recipe, "id" | "author" | "createdAt" | "updatedAt" | "version">,
+): Omit<RecipeDTO, "id" | "created_by" | "created_at" | "updated_at" | "version"> {
     return {
         title: r.title,
         slug: r.slug,
@@ -54,7 +55,8 @@ export function recipeToDtoPayload(
     }
 }
 
-type PartialRecipe = Partial<Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author">>
+// version is never written: the database bumps it
+type PartialRecipe = Partial<Omit<Recipe, "id" | "createdAt" | "updatedAt" | "author" | "version">>
 
 export function recipeToDtoPayloadPartial(input: PartialRecipe) {
     const out: Partial<RecipeDTO> = {}

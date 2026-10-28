@@ -1,7 +1,7 @@
 "use client"
 
 import {AlertCircle} from "lucide-react"
-import {useRouter} from "next/navigation"
+import {useRouter, useSearchParams} from "next/navigation"
 import type React from "react"
 import {useId, useState} from "react"
 import {Alert, AlertDescription} from "@/components/ui/alert"
@@ -9,10 +9,13 @@ import {Button} from "@/components/ui/button"
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
+import {safeNextPath} from "@/lib/safe-next-path"
 import {useAuthStore} from "@/lib/store/auth-store"
 
 export default function LoginPage() {
     const router = useRouter()
+    // An MCP client's consent screen sends people here with ?next= and expects them back after signing in
+    const next = useSearchParams().get("next")
     const login = useAuthStore((state) => state.login)
     const emailId = useId();
     const passwordId = useId();
@@ -29,7 +32,7 @@ export default function LoginPage() {
         try {
             const success = await login(email, password)
             if (success) {
-                router.push("/admin")
+                router.push(typeof window === "undefined" ? "/admin" : safeNextPath(next, "/admin"))
             } else {
                 setError("Correo o contraseña inválidos")
             }

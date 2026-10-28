@@ -92,7 +92,7 @@ describe("groups", () => {
 describe("adapter read/write", () => {
     const dto: RecipeDTO = {
         id: "r1", title: "Dhal", slug: "dhal", description: "", emoji: "🍛", content_md: "## Instrucciones",
-        prep_time: 10, cook_time: 25, servings: 4, difficulty: "easy", tags: [], is_published: true,
+        prep_time: 10, cook_time: 25, servings: 4, difficulty: "easy", tags: [], is_published: true, version: 1,
         created_by: "u", created_at: new Date(0), updated_at: new Date(0),
         ingredients: [{id: "a", name: "lentejas", quantity: {min: 1}, unit: "bote"}],
     }

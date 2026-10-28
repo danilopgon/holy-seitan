@@ -1,13 +1,13 @@
-/** biome-ignore-all lint/style/noNonNullAssertion: Conexión a Supabase */
 import {createServerClient, type CookieOptions} from "@supabase/ssr"
 import {cookies} from "next/headers"
+import {supabasePublishableKey, supabaseUrl} from "@/core/supabase-env"
 
 export async function supabaseServer() {
     const cookieStore = await cookies() // Next 15: mejor await
 
     return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        supabaseUrl,
+        supabasePublishableKey,
         {
             cookies: {
                 getAll() {
