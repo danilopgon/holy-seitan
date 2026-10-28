@@ -72,9 +72,15 @@ Se guarda en `recipes.ingredients jsonb not null default '[]'`, con un `check` d
 5. **Comprobar.** Que el número de filas actualizadas sea el de aprobadas. Que ninguna receta aprobada tenga `ingredients = '[]'` ni `content_md` vacío. Y repaso visual de la ficha de cada una.
 6. **Revertir.** `pnpm ingredients:phase0 rollback <copia.json>` genera `.migration/rollback.sql`, que devuelve `content_md` e `ingredients` a lo que había en la copia.
 
-## Pendiente
+## Aplicado (2026-10-28)
 
-- **Aplicar a producción** los pasos 1 y 4 del plan. El SQL está generado (`.migration/apply.sql`, 27 `update` en una transacción que se aborta entera si no se actualizan las 27), pero no se ha ejecutado.
+- **Esquema.** Migración `add_recipe_ingredients` aplicada en Supabase.
+- **Datos.** `apply.sql` ejecutado: 27 de 27. Comparado después con la propuesta, `ingredients` y `content_md` coinciden byte a byte, y ninguna otra columna cambió.
+- **Fechas.** El trigger `trg_set_updated_at` reescribió `updated_at`. Se restauraron las fechas de la copia, porque la portada destaca la receta actualizada más recientemente, y el generador ahora desactiva el trigger dentro de la transacción.
+- **Vuelta atrás de los datos:** `.migration/rollback.sql`.
+- **Vuelta atrás del esquema:** `alter table public.recipes drop column ingredients;`.
+
+## Pendiente
 - **Etiquetas casi repetidas** (aparte, en la portada): `rapido`/`rápido`, `salado`/`sálado`, `confort`/`comfort`, `garbanzo`/`garbanzos`, `italiana`/`italiano`.
 
 ## Pruebas

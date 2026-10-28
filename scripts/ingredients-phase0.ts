@@ -124,8 +124,7 @@ function applySql(proposalPath: string) {
     const statements = approved.map(
         (p) => `update public.recipes
    set ingredients = ${sqlString(JSON.stringify(p.ingredients))}::jsonb,
-       content_md = ${sqlString(p.content_md)},
-       updated_at = now()
+       content_md = ${sqlString(p.content_md)}
  where id = ${sqlString(p.id)}
    and encode(sha256(convert_to(content_md, 'UTF8')), 'hex') = ${sqlString(p.contentHash)}
    and ingredients = '[]'::jsonb;`,
@@ -134,6 +133,8 @@ function applySql(proposalPath: string) {
         `-- ${approved.length} recetas aprobadas de ${proposal.length}. Revisar el recuento de filas de cada update:`,
         `-- 0 significa que la receta cambió desde la copia o ya tenía ingredientes; el bloque final aborta entonces la transacción.`,
         `begin;`,
+        // updated_at stays: the trigger would stamp now() and reshuffle the recipe the home page features
+        `alter table public.recipes disable trigger trg_set_updated_at;`,
         ...statements,
         // All or nothing: a skipped recipe aborts the whole transaction instead of leaving a partial migration
         `do $$ begin
@@ -141,6 +142,7 @@ function applySql(proposalPath: string) {
     raise exception 'migración incompleta: alguna receta cambió desde la copia o ya tenía ingredientes';
   end if;
 end $$;`,
+        `alter table public.recipes enable trigger trg_set_updated_at;`,
         `commit;`,
         ``,
     ].join("\n\n")
@@ -155,7 +157,10 @@ function rollbackSql(backupPath: string) {
         (r) => `update public.recipes set content_md = ${sqlString(r.content_md)}, ingredients = ${sqlString(JSON.stringify(r.ingredients ?? []))}::jsonb where id = ${sqlString(r.id)};`,
     )
     mkdirSync(OUT, {recursive: true})
-    writeFileSync(`${OUT}/rollback.sql`, ["begin;", ...statements, "commit;", ""].join("\n"))
+    writeFileSync(
+        `${OUT}/rollback.sql`,
+        ["begin;", "alter table public.recipes disable trigger trg_set_updated_at;", ...statements, "alter table public.recipes enable trigger trg_set_updated_at;", "commit;", ""].join("\n"),
+    )
     console.log(`${OUT}/rollback.sql · ${rows.length} recetas`)
 }
 
