@@ -100,3 +100,51 @@ Deno.test('the proposal id binds slug, version, edits and summary, not key order
   assertNotEquals(id, await proposalId('prueba', 3, edits, 'otro resumen'))
   assertEquals(canonicalJson({ b: 1, a: [2, { d: 3, c: undefined }] }), '{"a":[2,{"d":3}],"b":1}')
 })
+
+import { buildNewRecipe, slugify, uniqueSlug } from './recipe-edits.ts'
+
+const newRecipe = {
+  title: '  Hummus de Remolacha ',
+  description: 'Hummus rosa con remolacha asada',
+  emoji: '🥙',
+  content_md: '## Instrucciones\n\n1. Trituramos todo.',
+  ingredients: [
+    { name: 'garbanzos cocidos', quantity: { min: 400 }, unit: 'g' },
+    { name: 'remolacha asada', quantity: { min: 1 } },
+    { name: 'sal', note: 'al gusto' },
+  ],
+  prep_time: 10,
+  cook_time: 0,
+  servings: 4,
+  difficulty: 'easy' as const,
+  tags: ['Untable', 'untable', ' rápido '],
+}
+
+Deno.test('slugs follow the admin form and avoid collisions', () => {
+  assertEquals(slugify('Lasaña vegana de soja'), 'lasana-vegana-de-soja')
+  assertEquals(uniqueSlug('dhal', ['dhal', 'dhal-2']), 'dhal-3')
+  assertEquals(uniqueSlug('hummus', ['dhal']), 'hummus')
+})
+
+Deno.test('a new recipe is cleaned, ids are generated and it is published by default', () => {
+  let n = 0
+  const result = buildNewRecipe(newRecipe, 'hummus-de-remolacha', () => String(++n))
+  assert(result.ok)
+  assertEquals(result.row.title, 'Hummus de Remolacha')
+  assertEquals(result.row.ingredients.map((i) => i.id), ['hummus-de-remolacha-1', 'hummus-de-remolacha-2', 'hummus-de-remolacha-3'])
+  assertEquals(result.row.ingredients[2], { id: 'hummus-de-remolacha-3', name: 'sal', note: 'al gusto' })
+  assertEquals(result.row.tags, ['untable', 'rápido'])
+  assertEquals(result.row.is_published, true)
+  const draft = buildNewRecipe({ ...newRecipe, publish: false }, 'x', () => 'a')
+  assert(draft.ok && draft.row.is_published === false)
+})
+
+Deno.test('an invalid new recipe reports every problem', () => {
+  const result = buildNewRecipe(
+    { ...newRecipe, content_md: ' ', servings: 0, difficulty: 'facil' as never, ingredients: [{ name: 'x', quantity: { min: -1 } }] },
+    'hummus',
+    () => '1',
+  )
+  assert(!result.ok)
+  assertEquals(result.errors.length, 4)
+})

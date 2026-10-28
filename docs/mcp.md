@@ -1,6 +1,6 @@
 # Servidor MCP de Holy Seitan
 
-Permite que un agente (Claude Code, ChatGPT…) lea recetas y aplique cambios que hayas aprobado. Es la issue #9.
+Permite que un agente (Claude Code, ChatGPT…) lea recetas, cree recetas nuevas y aplique cambios que hayas aprobado. Es la issue #9.
 
 - **Endpoint:** `https://krenaahusuofcxvxmzrt.supabase.co/functions/v1/mcp` (Edge Function `supabase/functions/mcp`).
 - **Acceso:** OAuth 2.1 con Supabase Auth. Solo entran las dos cuentas existentes (las altas están cerradas) y cada conexión pide consentimiento en `/oauth/consent`. Las conexiones se revocan en `/admin`, en "Agentes conectados".
@@ -16,6 +16,10 @@ Permite que un agente (Claude Code, ChatGPT…) lea recetas y aplique cambios qu
 | `apply_recipe_update` | Guarda **exactamente** la propuesta aprobada (mismo `proposal_id`), la vuelve a leer y lo confirma. |
 | `get_recipe_history` | Versiones anteriores: quién, desde dónde (panel o MCP), por qué y cuándo. |
 | `restore_recipe_revision` | Devuelve la receta a una versión anterior. La restauración también queda en el historial. |
+| `propose_recipe_create` | Valida una receta nueva y devuelve su vista previa, el slug y un `proposal_id`. No guarda nada. |
+| `create_recipe` | Crea **exactamente** la receta aprobada, como la cuenta conectada, y la vuelve a leer. Se publica por defecto, como en el panel; con `publish: false` queda como borrador oculto. |
+
+Recetas nuevas: título, descripción, emoji, preparación en Markdown (sin la lista de ingredientes), ingredientes estructurados, tiempos, raciones, dificultad y etiquetas. El slug sale del título y, si ya existe, se añade `-2`, `-3`… Borrar recetas no se puede desde el MCP, solo desde el panel.
 
 Cambios permitidos: título, descripción, fragmentos exactos de la preparación (`old → new`, que tiene que aparecer una sola vez) e ingredientes (añadir, editar, quitar y mover). Cada escritura comprueba la `version` que se leyó; si la receta ha cambiado entretanto, falla con un conflicto en vez de pisar el cambio.
 

@@ -271,9 +271,117 @@ export function canonicalJson(value: unknown): string {
   return JSON.stringify(value)
 }
 
-// Binds an apply call to exactly what was proposed: same recipe, same base version, same edits, same summary
-export async function proposalId(slug: string, baseVersion: number, edits: RecipeEdits, summary: string): Promise<string> {
+// Binds an apply call to exactly what was proposed: same recipe, same base version, same edits, same summary.
+// New recipes use base version 0 and the full recipe as the edits.
+export async function proposalId(slug: string, baseVersion: number, edits: unknown, summary: string): Promise<string> {
   const data = new TextEncoder().encode(canonicalJson({ slug, baseVersion, edits, summary }))
   const digest = await crypto.subtle.digest('SHA-256', data)
   return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('').slice(0, 32)
+}
+
+export type Difficulty = 'easy' | 'medium' | 'hard'
+
+export interface NewRecipeInput {
+  title: string
+  description: string
+  emoji: string
+  content_md: string
+  ingredients: Omit<RecipeIngredient, 'id'>[]
+  prep_time: number
+  cook_time: number
+  servings: number
+  difficulty: Difficulty
+  tags?: string[]
+  publish?: boolean
+}
+
+export interface NewRecipeRow {
+  slug: string
+  title: string
+  description: string
+  emoji: string
+  content_md: string
+  ingredients: RecipeIngredient[]
+  prep_time: number
+  cook_time: number
+  servings: number
+  difficulty: Difficulty
+  tags: string[]
+  is_published: boolean
+}
+
+export type NewRecipeResult = { ok: true; row: NewRecipeRow } | { ok: false; errors: string[] }
+
+// Same rule as the admin form: lowercase, accents dropped, words joined by dashes
+export function slugify(title: string): string {
+  return title
+    .normalize('NFD')
+    .replace(/\p{M}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 160)
+}
+
+// First free slug: "dhal", then "dhal-2", "dhal-3"…
+export function uniqueSlug(base: string, taken: string[]): string {
+  const used = new Set(taken)
+  if (!used.has(base)) return base
+  let n = 2
+  while (used.has(`${base}-${n}`)) n++
+  return `${base}-${n}`
+}
+
+const isWholeNumber = (n: unknown, min: number) => typeof n === 'number' && Number.isInteger(n) && n >= min
+
+// Validates a new recipe and gives every ingredient a stable id; the slug comes from the title
+export function buildNewRecipe(input: NewRecipeInput, slug: string, newId: () => string): NewRecipeResult {
+  const errors: string[] = []
+  const title = input.title?.trim() ?? ''
+  const description = input.description?.trim() ?? ''
+  const emoji = input.emoji?.trim() ?? ''
+  const content = input.content_md?.trim() ?? ''
+
+  if (!title || title.length > 200) errors.push('title must be 1–200 characters')
+  if (!description || description.length > 280) errors.push('description must be 1–280 characters')
+  if (!emoji || Array.from(emoji).length > 16) errors.push('emoji must be one emoji (at most 16 characters)')
+  if (!content) errors.push('content_md (the preparation) cannot be empty; ingredients go in their own list, not here')
+  if (!slug) errors.push('the title must contain letters or numbers to build a slug')
+  if (!isWholeNumber(input.prep_time, 0)) errors.push('prep_time must be a whole number of minutes ≥ 0')
+  if (!isWholeNumber(input.cook_time, 0)) errors.push('cook_time must be a whole number of minutes ≥ 0')
+  if (!isWholeNumber(input.servings, 1)) errors.push('servings must be a whole number ≥ 1')
+  if (!['easy', 'medium', 'hard'].includes(input.difficulty)) errors.push('difficulty must be easy, medium or hard')
+
+  const ingredients: RecipeIngredient[] = []
+  ;(input.ingredients ?? []).forEach((ing, i) => {
+    const where = `ingredients[${i}]`
+    if (!ing || typeof ing.name !== 'string' || !ing.name.trim()) return void errors.push(`${where}: name is required`)
+    const qErr = quantityError(ing.quantity, where)
+    if (qErr) return void errors.push(qErr)
+    ingredients.push(cleanIngredient({ ...ing, id: `${slug}-${newId()}` }))
+  })
+  if (!ingredients.length && !errors.some((e) => e.startsWith('ingredients'))) {
+    errors.push('ingredients cannot be empty: list at least one')
+  }
+
+  const tags = [...new Set((input.tags ?? []).map((t) => t.trim().toLowerCase()).filter(Boolean))]
+
+  if (errors.length) return { ok: false, errors }
+  return {
+    ok: true,
+    row: {
+      slug,
+      title,
+      description,
+      emoji,
+      content_md: content,
+      ingredients,
+      prep_time: input.prep_time,
+      cook_time: input.cook_time,
+      servings: input.servings,
+      difficulty: input.difficulty,
+      tags,
+      is_published: input.publish ?? true,
+    },
+  }
 }

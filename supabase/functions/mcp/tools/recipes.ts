@@ -1,7 +1,17 @@
 import type { McpServer } from 'npm:@modelcontextprotocol/server@2.0.0'
 import { z } from 'npm:zod@4.4.3'
 
-import { applyRecipeEdits, canonicalJson, type EditableRecipe, proposalId, type RecipeEdits } from './recipe-edits.ts'
+import {
+  applyRecipeEdits,
+  buildNewRecipe,
+  canonicalJson,
+  type EditableRecipe,
+  type NewRecipeInput,
+  proposalId,
+  type RecipeEdits,
+  slugify,
+  uniqueSlug,
+} from './recipe-edits.ts'
 import { errorResult, jsonResult, runtimeErrorResult } from './result.ts'
 import type { ToolContext } from './types.ts'
 
@@ -58,6 +68,26 @@ const editsSchema = z.object({
     .describe('Changes to the structured ingredient list, by ingredient id from get_recipe'),
 })
 
+const newRecipeSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(280).describe('One line shown under the title and in the index'),
+  emoji: z.string().min(1).describe('A single food emoji that represents the dish, e.g. "🍛"'),
+  content_md: z
+    .string()
+    .min(1)
+    .describe('The preparation in Markdown, starting with "## Instrucciones" and numbered steps. Do not list ingredients here.'),
+  ingredients: z.array(ingredientInput).min(1).describe('Structured ingredient list, in order; ids are generated'),
+  prep_time: z.number().int().min(0).describe('Minutes'),
+  cook_time: z.number().int().min(0).describe('Minutes'),
+  servings: z.number().int().min(1),
+  difficulty: z.enum(['easy', 'medium', 'hard']),
+  tags: z.array(z.string()).optional().describe('Lowercase Spanish tags, e.g. ["cena", "legumbres"]'),
+  publish: z
+    .boolean()
+    .optional()
+    .describe('Defaults to true, like the admin panel. false keeps it as a hidden draft (it cannot be published from the panel yet)'),
+})
+
 const recipeRef = {
   slug: z.string().min(1).describe('Recipe slug from search_recipes or get_recipe'),
   base_version: z.number().int().positive().describe('The version you read with get_recipe'),
@@ -92,6 +122,20 @@ function writeErrorResult(error: { code?: string; message?: string }, slug: stri
 }
 
 const newIngredientId = (slug: string) => () => `${slug}-${crypto.randomUUID().slice(0, 8)}`
+
+// Ingredient ids are positions so the same proposal always describes the same recipe
+const positionalId = () => {
+  let n = 0
+  return () => String(++n)
+}
+
+async function freeSlug({ supabase }: ToolContext, title: string): Promise<string> {
+  const base = slugify(title)
+  if (!base) return ''
+  const { data, error } = await supabase.from('recipes').select('slug').or(`slug.eq.${base},slug.like.${base}-%`)
+  if (error) throw error
+  return uniqueSlug(base, (data ?? []).map((r) => r.slug as string))
+}
 
 export function registerRecipeTools(server: McpServer, context: ToolContext): void {
   const { supabase } = context
@@ -245,6 +289,83 @@ export function registerRecipeTools(server: McpServer, context: ToolContext): vo
           version: saved?.version ?? null,
           url: `${SITE_URL}/recipe/${slug}`,
           undo: `restore_recipe_revision with slug "${slug}", version ${base_version}, base_version ${saved?.version}`,
+        })
+      } catch (error) {
+        return runtimeErrorResult(error)
+      }
+    },
+  )
+
+  server.registerTool(
+    'propose_recipe_create',
+    {
+      description:
+        'Validate a new recipe and return a preview, its slug and a proposal_id. Saves nothing. ' +
+        'Search first so the recipe does not already exist, show the preview to the user and only call ' +
+        'create_recipe after they explicitly approve it.',
+      inputSchema: z.object({ recipe: newRecipeSchema }),
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    },
+    async ({ recipe }) => {
+      try {
+        const slug = await freeSlug(context, recipe.title)
+        const result = buildNewRecipe(recipe as NewRecipeInput, slug, positionalId())
+        if (!result.ok) return errorResult(`The recipe is not valid:\n- ${result.errors.join('\n- ')}`)
+        return jsonResult({
+          proposal_id: await proposalId(slug, 0, recipe, 'create'),
+          slug,
+          preview: result.row,
+          url: `${SITE_URL}/recipe/${slug}`,
+          next_step:
+            'Show this preview to the user. If they approve it, call create_recipe with exactly the same recipe and ' +
+            'this proposal_id. If they want changes, propose again.',
+        })
+      } catch (error) {
+        return runtimeErrorResult(error)
+      }
+    },
+  )
+
+  server.registerTool(
+    'create_recipe',
+    {
+      description:
+        'Create a recipe the user has explicitly approved. Requires the proposal_id from propose_recipe_create and ' +
+        'exactly the same recipe. Saves it as the signed-in admin and reads it back to confirm.',
+      inputSchema: z.object({ recipe: newRecipeSchema, proposal_id: z.string().length(32) }),
+      annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
+    },
+    async ({ recipe, proposal_id }) => {
+      try {
+        const slug = await freeSlug(context, recipe.title)
+        if (proposal_id !== (await proposalId(slug, 0, recipe, 'create'))) {
+          return errorResult(
+            'proposal_id does not match this recipe (or its slug was taken meanwhile). Call propose_recipe_create ' +
+              'again and ask the user to approve the new preview.',
+          )
+        }
+        const result = buildNewRecipe(recipe as NewRecipeInput, slug, positionalId())
+        if (!result.ok) return errorResult(`The recipe is not valid:\n- ${result.errors.join('\n- ')}`)
+
+        const { error } = await supabase.from('recipes').insert({ ...result.row, created_by: context.userClaims.id })
+        if (error) {
+          if (error.code === '42501') return errorResult('Not allowed: only the recipe book admins can create recipes.')
+          if (error.code === '23505') return errorResult(`The slug "${slug}" was just taken. Call propose_recipe_create again.`)
+          return runtimeErrorResult(error)
+        }
+
+        const saved = await loadRecipe(context, slug)
+        const verified = !!saved &&
+          saved.version === 1 &&
+          saved.content_md === result.row.content_md &&
+          canonicalJson(saved.ingredients) === canonicalJson(result.row.ingredients)
+        return jsonResult({
+          created: true,
+          verified,
+          slug,
+          version: saved?.version ?? null,
+          is_published: result.row.is_published,
+          url: `${SITE_URL}/recipe/${slug}`,
         })
       } catch (error) {
         return runtimeErrorResult(error)
