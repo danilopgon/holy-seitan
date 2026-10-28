@@ -118,8 +118,8 @@ async function main() {
     await mcp(admin.accessToken, "initialize", {protocolVersion: "2025-06-18", capabilities: {}, clientInfo: {name: "smoke", version: "1"}})
     const tools = (await mcp(admin.accessToken, "tools/list")).result?.tools?.map((t: { name: string }) => t.name) ?? []
     check(
-        ["search_recipes", "get_recipe", "propose_recipe_update", "apply_recipe_update", "get_recipe_history", "restore_recipe_revision"].every((t) => tools.includes(t)),
-        "tools/list exposes the six recipe tools",
+        ["search_recipes", "get_recipe", "propose_recipe_update", "apply_recipe_update", "get_recipe_history", "restore_recipe_revision", "propose_recipe_create", "create_recipe"].every((t) => tools.includes(t)),
+        "tools/list exposes the eight recipe tools",
         tools,
     )
 
@@ -161,6 +161,32 @@ async function main() {
     const back = (await tool(admin.accessToken, "get_recipe", {slug: SLUG})).data
     check(back?.content_md === recipe.content_md && JSON.stringify(back.ingredients) === JSON.stringify(recipe.ingredients), "the restored recipe equals the original")
 
+    const newRecipe = {
+        title: "Hummus de prueba",
+        description: "Receta creada por la prueba del MCP",
+        emoji: "🥙",
+        content_md: "## Instrucciones\n\n1. Trituramos los garbanzos con el tahini.",
+        ingredients: [{name: "garbanzos cocidos", quantity: {min: 400}, unit: "g"}, {name: "tahini", quantity: {min: 2}, unit: "cucharadas"}],
+        prep_time: 10,
+        cook_time: 0,
+        servings: 4,
+        difficulty: "easy",
+        tags: ["prueba"],
+        publish: false,
+    }
+    const createProposal = await tool(admin.accessToken, "propose_recipe_create", {recipe: newRecipe})
+    check(!createProposal.isError && createProposal.data?.slug === "hummus-de-prueba", "propose_recipe_create returns a preview and a slug", createProposal)
+    const notYet = await tool(admin.accessToken, "get_recipe", {slug: "hummus-de-prueba"})
+    check(notYet.isError, "proposing a recipe does not create it")
+    const forgedCreate = await tool(admin.accessToken, "create_recipe", {recipe: {...newRecipe, servings: 8}, proposal_id: createProposal.data?.proposal_id})
+    check(forgedCreate.isError && /does not match/.test(forgedCreate.text ?? ""), "create_recipe refuses a recipe that differs from the proposal", forgedCreate)
+    const created = await tool(admin.accessToken, "create_recipe", {recipe: newRecipe, proposal_id: createProposal.data?.proposal_id})
+    check(!created.isError && created.data?.verified === true && created.data?.version === 1, "create_recipe saves and verifies the new recipe", created)
+    const createdRecipe = (await tool(admin.accessToken, "get_recipe", {slug: "hummus-de-prueba"})).data
+    check(createdRecipe?.is_published === false && createdRecipe.ingredients[0].id === "hummus-de-prueba-1", "the new recipe is a draft with generated ingredient ids", createdRecipe)
+    const second = await tool(admin.accessToken, "propose_recipe_create", {recipe: newRecipe})
+    check(second.data?.slug === "hummus-de-prueba-2", "a repeated title gets a free slug instead of overwriting", second.data)
+
     const intruder = await connect("intruso@local.test")
     check(!!intruder.accessToken, "a signed-in user without the admin role can connect (consent) …")
     const hidden = await tool(intruder.accessToken, "get_recipe", {slug: SLUG})
@@ -170,6 +196,12 @@ async function main() {
     const dhalProposal = (await tool(intruder.accessToken, "propose_recipe_update", {slug: "dhal", base_version: dhal.version, edits: dhalEdits, summary: "intento"})).data
     const denied = await tool(intruder.accessToken, "apply_recipe_update", {slug: "dhal", base_version: dhal.version, edits: dhalEdits, summary: "intento", proposal_id: dhalProposal.proposal_id})
     check(denied.isError && /Not allowed/.test(denied.text ?? ""), "… and cannot change published ones", denied)
+    const spamProposal = (await tool(intruder.accessToken, "propose_recipe_create", {recipe: {...newRecipe, title: "Spam"}})).data
+    const spam = await tool(intruder.accessToken, "create_recipe", {recipe: {...newRecipe, title: "Spam"}, proposal_id: spamProposal?.proposal_id})
+    check(spam.isError && /Not allowed/.test(spam.text ?? ""), "… nor create recipes", spam)
+
+    // Leave the local database as it was
+    await admin.supabase.from("recipes").delete().eq("slug", "hummus-de-prueba")
 
     const revoked = await admin.supabase.auth.oauth.revokeGrant({clientId: admin.clientId})
     check(!revoked.error, "the admin can revoke the client", revoked.error)

@@ -23,7 +23,7 @@ npx biome check .           # lint only
 npx biome check --write .   # lint + format (fixes in place)
 ```
 
-There is no test suite in the project.
+Tests: `pnpm test` (lib, node:test via tsx), `pnpm test:functions` (MCP Edge Function, Deno), `pnpm test:db` (pgTAP, local Supabase) and `pnpm mcp:smoke` (end-to-end MCP against local Supabase). See `docs/mcp.md`.
 
 **Environment setup**: Copy `env.example` to `.env.local` and fill in:
 - `NEXT_PUBLIC_SUPABASE_URL`
@@ -33,7 +33,7 @@ There is no test suite in the project.
 ## Architecture
 
 ### Stack
-- Next.js 15 App Router, React 18, TypeScript (strict)
+- Next.js 16 App Router, React 19, TypeScript (strict)
 - Supabase — database + auth
 - Drizzle ORM — schema definition and type inference only (no migration scripts are set up)
 - Zustand — global client state
