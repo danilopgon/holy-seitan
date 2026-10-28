@@ -1,7 +1,9 @@
 import assert from "node:assert/strict"
 import {describe, it} from "node:test"
 import type {RecipeDTO} from "@/core/models/recipe-dto"
+import {ingredientsToRows, rowsToIngredients} from "@/lib/ingredient-rows"
 import {
+    editableQuantity,
     formatAmount,
     formatIngredientAmount,
     groupIngredients,
@@ -144,5 +146,26 @@ describe("Markdown extraction (Phase 0)", () => {
     })
     it("reports a missing section as a blocker", () => {
         assert.equal(extractIngredients("## Pasos\n1. Hervir").issues[0].level, "blocker")
+    })
+})
+
+describe("editor rows round trip", () => {
+    const stored = [
+        {id: "1", name: "tofu", quantity: {min: 12.5}, unit: "g", group: "Base"},
+        {id: "2", name: "harina", quantity: {min: 10000}, unit: "g", group: "Base"},
+        {id: "3", name: "azúcar", quantity: {min: 1 / 3}, unit: "taza"},
+        {id: "4", name: "agua", quantity: {min: 4 / 3, max: 2}, unit: "tazas", note: "templada"},
+        {id: "5", name: "sal"},
+        {id: "6", name: "soja", quantity: {min: 0.125}, unit: "cucharadita", group: "Salsa"},
+    ]
+
+    it("shows stored amounts without rounding or grouping", () => {
+        assert.equal(editableQuantity({min: 12.5}), "12,5")
+        assert.equal(editableQuantity({min: 10000}), "10000")
+        assert.equal(editableQuantity({min: 1 / 3}), "1/3")
+        assert.equal(editableQuantity({min: 4 / 3, max: 2}), "1 1/3-2")
+    })
+    it("saves an untouched recipe exactly as stored, groups included", () => {
+        assert.deepEqual(rowsToIngredients(ingredientsToRows(stored)), {ok: true, ingredients: stored})
     })
 })

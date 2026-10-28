@@ -122,26 +122,34 @@ function applySql(proposalPath: string) {
     const proposal: ProposalEntry[] = JSON.parse(readFileSync(proposalPath, "utf8"))
     const approved = proposal.filter((p) => p.approved)
     const statements = approved.map(
-        (p) => `update public.recipes
+        (p) => `  update public.recipes
    set ingredients = ${sqlString(JSON.stringify(p.ingredients))}::jsonb,
        content_md = ${sqlString(p.content_md)}
  where id = ${sqlString(p.id)}
    and encode(sha256(convert_to(content_md, 'UTF8')), 'hex') = ${sqlString(p.contentHash)}
-   and ingredients = '[]'::jsonb;`,
+   and ingredients = '[]'::jsonb;
+  get diagnostics changed = row_count;
+  updated := updated + changed;`,
     )
     const sql = [
-        `-- ${approved.length} recetas aprobadas de ${proposal.length}. Revisar el recuento de filas de cada update:`,
-        `-- 0 significa que la receta cambió desde la copia o ya tenía ingredientes; el bloque final aborta entonces la transacción.`,
+        `-- ${approved.length} recetas aprobadas de ${proposal.length}.`,
+        `-- Cada update solo actúa si content_md sigue igual que en la copia y la receta no tenía ingredientes;`,
+        `-- si alguno no actúa, el bloque lanza una excepción y la transacción entera se deshace.`,
         `begin;`,
         // updated_at stays: the trigger would stamp now() and reshuffle the recipe the home page features
         `alter table public.recipes disable trigger trg_set_updated_at;`,
+        // All or nothing, counted on the rows each update really touched
+        `do $migration$
+declare
+  changed int;
+  updated int := 0;
+begin`,
         ...statements,
-        // All or nothing: a skipped recipe aborts the whole transaction instead of leaving a partial migration
-        `do $$ begin
-  if (select count(*) from public.recipes where ingredients <> '[]'::jsonb and id in (${approved.map((p) => sqlString(p.id)).join(", ")})) <> ${approved.length} then
-    raise exception 'migración incompleta: alguna receta cambió desde la copia o ya tenía ingredientes';
+        `  if updated <> ${approved.length} then
+    raise exception 'migración incompleta: % de ${approved.length} recetas actualizadas; alguna cambió desde la copia o ya tenía ingredientes', updated;
   end if;
-end $$;`,
+end
+$migration$;`,
         `alter table public.recipes enable trigger trg_set_updated_at;`,
         `commit;`,
         ``,

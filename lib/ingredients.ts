@@ -86,6 +86,20 @@ export function parseQuantity(text: string): QuantityParse {
     return {ok: true, quantity: {min, max}}
 }
 
+// What the editor shows for a stored amount: lossless, no rounding or grouping, so saving unchanged rows keeps them.
+// Thirds go as fractions because no decimal round-trips them.
+export function editableQuantity(q: IngredientQuantity): string {
+    const one = (n: number) => {
+        const whole = Math.floor(n)
+        const thirds = (n - whole) * 3
+        if (!Number.isInteger(n) && Math.abs(thirds - Math.round(thirds)) < 1e-9) {
+            return `${whole > 0 ? `${whole} ` : ""}${Math.round(thirds)}/3`
+        }
+        return String(n).replace(".", ",")
+    }
+    return q.max === undefined ? one(q.min) : `${one(q.min)}-${one(q.max)}`
+}
+
 export function scaleQuantity(q: IngredientQuantity, factor: number): IngredientQuantity {
     return q.max === undefined ? {min: q.min * factor} : {min: q.min * factor, max: q.max * factor}
 }

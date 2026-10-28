@@ -12,7 +12,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {Textarea} from "@/components/ui/textarea"
 import type {Recipe} from "@/core/models/recipe";
 import type {RecipeFormProps} from "@/core/models/recipe-page-props";
-import {IngredientsEditor, ingredientsToRows, rowsToIngredients} from "./ingredients-editor"
+import {ingredientsToRows, rowsToIngredients} from "@/lib/ingredient-rows"
+import {IngredientsEditor} from "./ingredients-editor"
 import {MarkdownRenderer} from "./markdown-renderer"
 
 
