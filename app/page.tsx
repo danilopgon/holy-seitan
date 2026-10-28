@@ -26,13 +26,14 @@ export default function HomePage() {
     const skeletonKeys = ["sk1", "sk2", "sk3", "sk4", "sk5", "sk6"]
 
     const allTags = useMemo(() => {
-        const tags = new Set<string>()
+        // Most used first, so the short list of filters is the useful one
+        const counts = new Map<string, number>()
         recipes.forEach((r) => {
             r.tags.forEach((t) => {
-                tags.add(t)
+                counts.set(t, (counts.get(t) ?? 0) + 1)
             })
         })
-        return Array.from(tags).sort()
+        return Array.from(counts.keys()).sort((a, b) => (counts.get(b) ?? 0) - (counts.get(a) ?? 0) || a.localeCompare(b, "es"))
     }, [recipes])
 
     const filteredRecipes = useMemo(() => {
@@ -68,7 +69,7 @@ export default function HomePage() {
     return (
         <main className="container mx-auto max-w-6xl px-4 pt-10 pb-12 md:pt-14">
             {/* Hero */}
-            <div className="grid gap-8 md:grid-cols-12 md:items-end mb-12">
+            <div className="grid gap-8 md:grid-cols-12 md:items-start mb-12">
                 <div className="md:col-span-5 min-w-0">
                     <h1 className="text-5xl md:text-6xl font-mono font-bold tracking-tight leading-none text-foreground mb-4 [overflow-wrap:break-word]">
                         Holy Seitan!

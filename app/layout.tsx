@@ -8,6 +8,7 @@ import {Suspense} from "react"
 import "./globals.css"
 import {Footer} from "@/components/footer";
 import {Header} from "@/components/header";
+import {ThemeProvider} from "@/components/theme-provider";
 import {RecipesProvider} from "@/lib/providers/recipes-provider";
 
 const notoEmoji = Noto_Emoji({subsets: ["emoji"], weight: "variable", variable: "--font-noto-emoji"})
@@ -25,15 +26,17 @@ export default function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="es">
+        <html lang="es" suppressHydrationWarning>
         <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable} ${notoEmoji.variable}`}>
-        <Suspense fallback={null}>
-            <div className="min-h-screen bg-background">
-                <Header/>
-                <RecipesProvider>{children}</RecipesProvider>
-                <Footer/>
-            </div>
-        </Suspense>
+        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <Suspense fallback={null}>
+                <div className="min-h-screen bg-background">
+                    <Header/>
+                    <RecipesProvider>{children}</RecipesProvider>
+                    <Footer/>
+                </div>
+            </Suspense>
+        </ThemeProvider>
         <Analytics/>
         </body>
         </html>

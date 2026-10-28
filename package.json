@@ -6,7 +6,9 @@
     "build": "next build",
     "dev": "next dev",
     "lint": "biome lint app/page.tsx \"app/recipe/[slug]/recipe-view.tsx\" components/recipe-card.tsx components/ui/chart.tsx components/ui/resizable.tsx lib/view-transition.ts next.config.mjs",
-    "start": "next start"
+    "start": "next start",
+    "test": "tsx --test \"lib/**/*.test.ts\"",
+    "ingredients:phase0": "tsx scripts/ingredients-phase0.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

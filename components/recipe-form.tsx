@@ -12,6 +12,8 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs"
 import {Textarea} from "@/components/ui/textarea"
 import type {Recipe} from "@/core/models/recipe";
 import type {RecipeFormProps} from "@/core/models/recipe-page-props";
+import {ingredientsToRows, rowsToIngredients} from "@/lib/ingredient-rows"
+import {IngredientsEditor} from "./ingredients-editor"
 import {MarkdownRenderer} from "./markdown-renderer"
 
 
@@ -25,12 +27,14 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
     prepTime: recipe?.prepTime || 0,
     cookTime: recipe?.cookTime || 0,
     servings: recipe?.servings || 4,
-    difficulty: recipe?.difficulty || "Fácil",
+    difficulty: recipe?.difficulty || "Facil",
     tags: recipe?.tags || [],
     author: recipe?.author || "Chef Tempeh",
   })
 
   const [tagInput, setTagInput] = useState("")
+  const [ingredientRows, setIngredientRows] = useState(() => ingredientsToRows(recipe?.ingredients ?? []))
+  const [ingredientsError, setIngredientsError] = useState<string | null>(null)
 
   const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -65,7 +69,14 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSubmit(formData as Omit<Recipe, "id" | "createdAt" | "updatedAt">)
+    const ingredients = rowsToIngredients(ingredientRows)
+    if (!ingredients.ok) {
+      setIngredientsError(ingredients.error)
+      document.getElementById("ingredients-card")?.scrollIntoView({ behavior: "smooth", block: "start" })
+      return
+    }
+    setIngredientsError(null)
+    onSubmit({ ...formData, ingredients: ingredients.ingredients } as Omit<Recipe, "id" | "createdAt" | "updatedAt">)
   }
 
   return (
@@ -205,13 +216,13 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Fácil" className="font-mono">
+                <SelectItem value="Facil" className="font-mono">
                   Fácil
                 </SelectItem>
                 <SelectItem value="Media" className="font-mono">
                   Media
                 </SelectItem>
-                <SelectItem value="Difícil" className="font-mono">
+                <SelectItem value="Dificil" className="font-mono">
                   Difícil
                 </SelectItem>
               </SelectContent>
@@ -253,9 +264,23 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
         </CardContent>
       </Card>
 
+      <Card id="ingredients-card">
+        <CardHeader>
+          <CardTitle className="font-mono font-semibold tracking-tight">Ingredientes</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <IngredientsEditor rows={ingredientRows} onChange={setIngredientRows} />
+          {ingredientsError && (
+            <p role="alert" className="text-sm text-destructive">
+              {ingredientsError}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
-          <CardTitle className="font-mono font-semibold tracking-tight">Contenido de la Receta (Markdown)</CardTitle>
+          <CardTitle className="font-mono font-semibold tracking-tight">Preparación (Markdown)</CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="edit" className="w-full">
@@ -273,7 +298,7 @@ export function RecipeForm({ recipe, onSubmit, onCancel }: RecipeFormProps) {
                 onChange={(e) => handleChange("content", e.target.value)}
                 required
                 className="font-mono min-h-[400px]"
-                placeholder="# Título de la Receta&#10;&#10;## Ingredientes&#10;- Ingrediente 1&#10;- Ingrediente 2&#10;&#10;## Instrucciones&#10;1. Paso 1&#10;2. Paso 2"
+                placeholder="## Instrucciones&#10;1. Paso 1&#10;2. Paso 2&#10;&#10;Los ingredientes van en su propia sección, no aquí."
               />
             </TabsContent>
             <TabsContent value="preview" className="mt-4">

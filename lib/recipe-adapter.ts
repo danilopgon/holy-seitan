@@ -1,5 +1,6 @@
 import type {Recipe} from "@/core/models/recipe";
 import type {RecipeDTO} from "@/core/models/recipe-dto";
+import {normalizeIngredients, parseStoredIngredients} from "@/lib/ingredients";
 
 const diffToUi: Record<RecipeDTO["difficulty"], Recipe["difficulty"]> = {
     easy: "Facil",
@@ -20,6 +21,7 @@ export function dtoToRecipe(dto: RecipeDTO, author: string): Recipe {
         slug: dto.slug,
         description: dto.description,
         content: dto.content_md,
+        ingredients: parseStoredIngredients(dto.ingredients),
         emoji: dto.emoji,
         prepTime: dto.prep_time ?? 0,
         cookTime: dto.cook_time ?? 0,
@@ -42,6 +44,7 @@ export function recipeToDtoPayload(
         description: r.description,
         emoji: r.emoji,
         content_md: r.content,
+        ingredients: normalizeIngredients(r.ingredients ?? []),
         prep_time: r.prepTime,
         cook_time: r.cookTime,
         servings: r.servings,
@@ -60,6 +63,7 @@ export function recipeToDtoPayloadPartial(input: PartialRecipe) {
     if (input.slug !== undefined) out.slug = input.slug
     if (input.description !== undefined) out.description = input.description
     if (input.content !== undefined) out.content_md = input.content
+    if (input.ingredients !== undefined) out.ingredients = normalizeIngredients(input.ingredients)
     if (input.emoji !== undefined) out.emoji = input.emoji
     if (input.prepTime !== undefined) out.prep_time = input.prepTime
     if (input.cookTime !== undefined) out.cook_time = input.cookTime

@@ -13,8 +13,17 @@ interface RecipeFiltersProps {
   availableTags: string[]
 }
 
+// Enough to fill two rows beside the hero; the rest open on demand
+const COLLAPSED_TAGS = 12
+
 export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availableTags }: RecipeFiltersProps) {
   const [search, setSearch] = useState("")
+  const [showAll, setShowAll] = useState(false)
+
+  const hidden = availableTags.length - COLLAPSED_TAGS
+  const visibleTags = showAll || hidden <= 0
+    ? availableTags
+    : availableTags.filter((tag, i) => i < COLLAPSED_TAGS || selectedTags.includes(tag))
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
@@ -37,8 +46,8 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
 
       <div>
         <p className="text-sm text-muted-foreground mb-2">Filtrar por etiquetas:</p>
-        <div className="flex flex-wrap gap-2">
-          {availableTags.map((tag) => (
+        <div id="recipe-tag-filters" className="flex flex-wrap gap-2">
+          {visibleTags.map((tag) => (
             <button
               key={tag}
               type="button"
@@ -52,6 +61,17 @@ export function RecipeFilters({ onSearchChange, onTagClick, selectedTags, availa
               {tag}
             </button>
           ))}
+          {hidden > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              aria-expanded={showAll}
+              aria-controls="recipe-tag-filters"
+              className="min-h-8 rounded-md px-2 text-sm font-mono text-primary underline-offset-4 hover:underline active:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {showAll ? "Ver menos" : `Ver todas (${availableTags.length})`}
+            </button>
+          )}
         </div>
       </div>
     </div>

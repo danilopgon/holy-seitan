@@ -1,3 +1,5 @@
+import type {RecipeIngredient} from "@/core/models/recipe-ingredient"
+
 export type RecipeDTO = {
     id: string,
     title: string;
@@ -5,6 +7,8 @@ export type RecipeDTO = {
     description: string;
     emoji: string;
     content_md: string;
+    // jsonb, `[]` for recipes not migrated yet
+    ingredients?: RecipeIngredient[];
     prep_time: number;
     cook_time: number;
     servings: number;

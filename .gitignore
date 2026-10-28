@@ -25,3 +25,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# ingredient migration backups and reports (issue #7)
+.migration/
