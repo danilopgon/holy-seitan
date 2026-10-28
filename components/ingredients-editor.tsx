@@ -1,15 +1,28 @@
 "use client"
 
 import {ArrowDown, ArrowUp, ListPlus, Plus, Trash2} from "lucide-react"
-import {useId, useState} from "react"
+import {type ReactNode, useId, useState} from "react"
 import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {Textarea} from "@/components/ui/textarea"
 import {type IngredientRow, newKey} from "@/lib/ingredient-rows"
+import {cn} from "@/lib/utils"
 import {editableQuantity, parseQuantity} from "@/lib/ingredients"
 import {parseIngredientLine} from "@/lib/ingredients-markdown"
 
+const ITEM_COLUMNS = "sm:grid-cols-[5.5rem_12rem_minmax(0,1.2fr)_minmax(0,1fr)]"
+
 const emptyItem = (): IngredientRow => ({kind: "item", key: newKey(), id: newKey(), quantity: "", unit: "", name: "", note: ""})
+
+// Labels show on phones, where each ingredient is a card; on wider screens one header row names the columns
+function Field({label, htmlFor, className, children}: { label: string; htmlFor: string; className?: string; children: ReactNode }) {
+    return (
+        <div className={cn("grid min-w-0 gap-1", className)}>
+            <label htmlFor={htmlFor} className="text-xs text-muted-foreground sm:sr-only">{label}</label>
+            {children}
+        </div>
+    )
+}
 
 interface Props {
     rows: IngredientRow[]
@@ -63,55 +76,19 @@ export function IngredientsEditor({rows, onChange}: Props) {
                 </p>
             )}
 
-            <ol className="space-y-2">
-                {rows.map((row, index) => (
-                    <li key={row.key} className="flex items-start gap-2">
-                        <div className="flex-1">
-                            {row.kind === "group" ? (
-                                <Input
-                                    aria-label="Título del grupo"
-                                    value={row.title}
-                                    onChange={(e) => update(row.key, {title: e.target.value})}
-                                    placeholder="Sin título: lo que sigue va sin grupo"
-                                    className="font-mono font-semibold"
-                                />
-                            ) : (
-                                <div className="grid grid-cols-[5rem_7rem_1fr] gap-2 max-sm:grid-cols-[4.5rem_1fr]">
-                                    <Input
-                                        aria-label="Cantidad"
-                                        value={row.quantity}
-                                        onChange={(e) => update(row.key, {quantity: e.target.value})}
-                                        placeholder="200"
-                                        inputMode="decimal"
-                                        aria-invalid={!parseQuantity(row.quantity).ok}
-                                        className="font-mono tabular-nums"
-                                    />
-                                    <Input
-                                        aria-label="Unidad"
-                                        value={row.unit}
-                                        onChange={(e) => update(row.key, {unit: e.target.value})}
-                                        placeholder="g"
-                                        list={`${id}-units`}
-                                        className="font-mono"
-                                    />
-                                    <Input
-                                        aria-label="Ingrediente"
-                                        value={row.name}
-                                        onChange={(e) => update(row.key, {name: e.target.value})}
-                                        placeholder="harina de garbanzo"
-                                        className="max-sm:col-span-2"
-                                    />
-                                    <Input
-                                        aria-label="Nota"
-                                        value={row.note}
-                                        onChange={(e) => update(row.key, {note: e.target.value})}
-                                        placeholder="Nota: picada, al gusto, opcional…"
-                                        className="col-span-3 max-sm:col-span-2 text-sm"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex shrink-0 gap-1">
+            {rows.some((r) => r.kind === "item") && (
+                <div aria-hidden="true" className={cn("hidden gap-x-2 text-xs text-muted-foreground sm:grid sm:pr-[8rem]", ITEM_COLUMNS)}>
+                    <span>Cantidad</span>
+                    <span>Unidad</span>
+                    <span>Ingrediente</span>
+                    <span>Nota</span>
+                </div>
+            )}
+
+            <ol className="space-y-3 sm:space-y-2">
+                {rows.map((row, index) => {
+                    const actions = (
+                        <div className="flex shrink-0 justify-end gap-1">
                             <Button type="button" variant="ghost" size="icon" onClick={() => move(index, -1)} disabled={index === 0} aria-label="Subir">
                                 <ArrowUp/>
                             </Button>
@@ -122,8 +99,72 @@ export function IngredientsEditor({rows, onChange}: Props) {
                                 <Trash2/>
                             </Button>
                         </div>
-                    </li>
-                ))}
+                    )
+
+                    if (row.kind === "group") {
+                        return (
+                            <li key={row.key} className="flex items-end gap-2 pt-3 first:pt-0 sm:items-center sm:gap-3 sm:pt-4">
+                                <Field label="Grupo" htmlFor={`${id}-${index}-group`} className="flex-1">
+                                    <Input
+                                        id={`${id}-${index}-group`}
+                                        value={row.title}
+                                        onChange={(e) => update(row.key, {title: e.target.value})}
+                                        placeholder="Grupo, por ejemplo «Para la salsa». Vacío: lo que sigue va sin grupo"
+                                        className="font-mono font-semibold"
+                                    />
+                                </Field>
+                                {actions}
+                            </li>
+                        )
+                    }
+
+                    // Example values only on a fresh row, so an empty unit never reads as "g"
+                    const fresh = !row.name && !row.quantity && !row.unit && !row.note
+                    return (
+                        <li key={row.key} className="rounded-lg border border-border bg-background p-3 sm:flex sm:items-center sm:gap-3 sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0">
+                            <div className={cn("grid min-w-0 flex-1 grid-cols-[6rem_minmax(0,1fr)] gap-x-2 gap-y-3 sm:gap-y-0", ITEM_COLUMNS)}>
+                                <Field label="Cantidad" htmlFor={`${id}-${index}-qty`}>
+                                    <Input
+                                        id={`${id}-${index}-qty`}
+                                        value={row.quantity}
+                                        onChange={(e) => update(row.key, {quantity: e.target.value})}
+                                        placeholder={fresh ? "200" : undefined}
+                                        inputMode="decimal"
+                                        aria-invalid={!parseQuantity(row.quantity).ok}
+                                        className="font-mono tabular-nums"
+                                    />
+                                </Field>
+                                <Field label="Unidad" htmlFor={`${id}-${index}-unit`}>
+                                    <Input
+                                        id={`${id}-${index}-unit`}
+                                        value={row.unit}
+                                        onChange={(e) => update(row.key, {unit: e.target.value})}
+                                        placeholder={fresh ? "g" : undefined}
+                                        list={`${id}-units`}
+                                        className="font-mono"
+                                    />
+                                </Field>
+                                <Field label="Ingrediente" htmlFor={`${id}-${index}-name`} className="col-span-2 sm:col-span-1">
+                                    <Input
+                                        id={`${id}-${index}-name`}
+                                        value={row.name}
+                                        onChange={(e) => update(row.key, {name: e.target.value})}
+                                        placeholder={fresh ? "harina de garbanzo" : undefined}
+                                    />
+                                </Field>
+                                <Field label="Nota" htmlFor={`${id}-${index}-note`} className="col-span-2 sm:col-span-1">
+                                    <Input
+                                        id={`${id}-${index}-note`}
+                                        value={row.note}
+                                        onChange={(e) => update(row.key, {note: e.target.value})}
+                                        placeholder={fresh ? "picada, al gusto, opcional…" : undefined}
+                                    />
+                                </Field>
+                            </div>
+                            <div className="mt-2 border-t border-border pt-2 sm:mt-0 sm:border-0 sm:pt-0">{actions}</div>
+                        </li>
+                    )
+                })}
             </ol>
 
             <datalist id={`${id}-units`}>
