@@ -23,13 +23,13 @@ export function Header() {
     return (
         <header className="border-b border-border bg-card">
             <div className="container mx-auto max-w-6xl px-4 py-4">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center justify-between gap-3 sm:gap-4">
                     <Link href="/" className="flex items-center gap-2 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
-                        <span className="font-emoji text-xl sm:text-2xl text-primary" aria-hidden="true">🌱</span>
-                        <span className="whitespace-nowrap text-xl sm:text-2xl font-mono font-bold text-foreground">Holy Seitan</span>
+                        <span className="font-emoji text-lg sm:text-2xl text-primary" aria-hidden="true">🌱</span>
+                        <span className="whitespace-nowrap text-lg sm:text-2xl font-mono font-bold text-foreground">Holy Seitan</span>
                     </Link>
 
-                    <nav className="flex items-center gap-3 sm:gap-4">
+                    <nav className="flex items-center gap-1 sm:gap-4">
                         <Link href="/" className={`${navLink} max-sm:hidden`}>
                             Recetas
                         </Link>
@@ -38,9 +38,16 @@ export function Header() {
                                 <Link href="/admin" className={navLink}>
                                     Admin
                                 </Link>
-                                <Button variant="ghost" size="sm" onClick={logoutAndNavigate} className="font-mono">
-                                    <LogOut className="h-4 w-4 mr-2"/>
-                                    Cerrar Sesión
+                                {/* Icon-only on phones, so the theme toggle still fits beside it */}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={logoutAndNavigate}
+                                    className="font-mono max-sm:size-11 max-sm:px-0"
+                                    aria-label="Cerrar sesión"
+                                >
+                                    <LogOut className="h-4 w-4 sm:mr-2" aria-hidden="true"/>
+                                    <span className="max-sm:sr-only">Cerrar Sesión</span>
                                 </Button>
                             </>
                         ) : (
