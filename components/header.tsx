@@ -5,6 +5,7 @@ import {useAuthStore} from "@/lib/store/auth-store"
 import {Button} from "@/components/ui/button"
 import {LogOut} from "lucide-react"
 import {useRouter} from "next/navigation";
+import {ThemeToggle} from "@/components/theme-toggle";
 
 const navLink =
     "inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-1 text-sm font-mono hover:text-primary transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
@@ -47,6 +48,7 @@ export function Header() {
                                 Acceso Admin
                             </Link>
                         )}
+                        <ThemeToggle/>
                     </nav>
                 </div>
             </div>

@@ -1,5 +1,5 @@
 /* Hallmark · checked: 2026-10-27 · genre: editorial (inferred)
- * fixed: 7b, 22, 34, 40, 63, F16, F18, lang · dark mode: issue #7
+ * fixed: 7b, 22, 34, 40, 63, F16, F18, lang · dark mode: data-theme (issue #7)
  * built: the project · redesign: polish (site), full (/: index-first, latest recipe leads, recipe index rows) · v2.0.0 */
 /* Owner decision: the recipe emoji and the 🌱 wordmark are brand content, drawn in Noto Emoji on a per-recipe tile. Hallmark 30a (Floor) stays open on purpose.
  * Geist Mono is the brand voice too: nav, buttons, labels, heads, figures and tags; sentences and free text in Geist Sans (Hallmark 64 open on purpose). */
@@ -7,9 +7,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 :root {
+  color-scheme: light;
   --background: oklch(0.99 0.004 145);
   --foreground: oklch(0.17 0.012 145);
   --card: oklch(0.995 0.004 145);
@@ -56,39 +57,51 @@
   --tile-5-fg: oklch(0.42 0.07 190);
 }
 
-.dark {
-  --background: oklch(0.14 0.005 145);
-  --foreground: oklch(0.95 0 0);
-  --card: oklch(0.17 0.004 145);
-  --card-foreground: oklch(0.95 0 0);
-  --popover: oklch(0.17 0.004 145);
-  --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.68 0.12 145); /* Lighter sage for dark backgrounds */
-  --primary-foreground: oklch(0.12 0 0);
-  --secondary: oklch(0.24 0.005 145);
-  --secondary-foreground: oklch(0.95 0 0);
-  --muted: oklch(0.24 0.005 145);
-  --muted-foreground: oklch(0.62 0 0);
-  --accent: oklch(0.26 0.015 145); /* Dark green-tinted surface */
-  --accent-foreground: oklch(0.95 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.95 0 0);
-  --border: oklch(0.26 0.008 145);
-  --input: oklch(0.26 0.008 145);
-  --ring: oklch(0.55 0.10 145);
-  --chart-1: oklch(0.68 0.12 145);
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: oklch(0.16 0.008 145);
+  --foreground: oklch(0.94 0.008 145);
+  --card: oklch(0.19 0.009 145);
+  --card-foreground: oklch(0.94 0.008 145);
+  --popover: oklch(0.19 0.009 145);
+  --popover-foreground: oklch(0.94 0.008 145);
+  --primary: oklch(0.72 0.12 145); /* Lighter sage for dark backgrounds */
+  --primary-foreground: oklch(0.16 0.02 145);
+  --secondary: oklch(0.26 0.01 145);
+  --secondary-foreground: oklch(0.93 0.008 145);
+  --muted: oklch(0.24 0.009 145);
+  --muted-foreground: oklch(0.71 0.015 145);
+  --accent: oklch(0.27 0.025 145); /* Dark green-tinted surface */
+  --accent-foreground: oklch(0.94 0.008 145);
+  --destructive: oklch(0.66 0.19 25); /* Readable as text on cards, white text at /60 */
+  --destructive-foreground: oklch(0.16 0.008 145);
+  --border: oklch(0.3 0.01 145);
+  --input: oklch(0.55 0.02 145); /* Field edges at 3:1 against the page */
+  --ring: oklch(0.72 0.12 145);
+  --chart-1: oklch(0.72 0.12 145);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.17 0.004 145);
-  --sidebar-foreground: oklch(0.95 0 0);
-  --sidebar-primary: oklch(0.68 0.12 145);
-  --sidebar-primary-foreground: oklch(0.12 0 0);
-  --sidebar-accent: oklch(0.26 0.015 145);
-  --sidebar-accent-foreground: oklch(0.95 0 0);
-  --sidebar-border: oklch(0.26 0.008 145);
-  --sidebar-ring: oklch(0.55 0.10 145);
+  --sidebar: oklch(0.19 0.009 145);
+  --sidebar-foreground: oklch(0.94 0.008 145);
+  --sidebar-primary: oklch(0.72 0.12 145);
+  --sidebar-primary-foreground: oklch(0.16 0.02 145);
+  --sidebar-accent: oklch(0.27 0.025 145);
+  --sidebar-accent-foreground: oklch(0.94 0.008 145);
+  --sidebar-border: oklch(0.3 0.01 145);
+  --sidebar-ring: oklch(0.72 0.12 145);
+  /* Emoji tiles: low-light tint, the emoji drawn light in the same hue */
+  --tile-1-bg: oklch(0.27 0.04 145);
+  --tile-1-fg: oklch(0.84 0.09 145);
+  --tile-2-bg: oklch(0.27 0.04 110);
+  --tile-2-fg: oklch(0.85 0.08 110);
+  --tile-3-bg: oklch(0.27 0.045 70);
+  --tile-3-fg: oklch(0.85 0.09 70);
+  --tile-4-bg: oklch(0.27 0.045 50);
+  --tile-4-fg: oklch(0.84 0.09 50);
+  --tile-5-bg: oklch(0.27 0.035 190);
+  --tile-5-fg: oklch(0.84 0.07 190);
 }
 
 @theme inline {

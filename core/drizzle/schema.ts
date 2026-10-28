@@ -1,5 +1,6 @@
 import {sql} from "drizzle-orm";
-import {boolean, integer, pgEnum, pgTable, text, timestamp, uuid, varchar} from "drizzle-orm/pg-core";
+import type {RecipeIngredient} from "@/core/models/recipe-ingredient";
+import {boolean, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid, varchar} from "drizzle-orm/pg-core";
 
 export const difficultyEnum = pgEnum("difficulty_level", ["easy", "medium", "hard"]);
 
@@ -11,6 +12,7 @@ const recipes = pgTable("recipes", {
 
     description: varchar("description", {length: 280}).notNull(),
     contentMd: text("content_md").notNull(),
+    ingredients: jsonb("ingredients").$type<RecipeIngredient[]>().notNull().default([]),
 
     emoji: varchar("emoji", {length: 16}).notNull(),
 
