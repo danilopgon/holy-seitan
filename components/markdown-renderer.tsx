@@ -44,6 +44,14 @@ const components: Components = {
     <strong className='font-semibold'>{children}</strong>
   ),
   em: ({ children }) => <em className='italic'>{children}</em>,
+  a: ({ href, children }) => (
+    <a
+      href={href}
+      className='font-medium text-primary underline decoration-primary/50 underline-offset-4 transition-colors hover:decoration-primary focus-visible:rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
+    >
+      {children}
+    </a>
+  ),
   code: ({ children }) => (
     <code className='bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-primary'>
       {children}
